@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "massar_repo" {
-  name                 = "ecr-repo-${var.environment}"
+  name                 = "ecr-repository-${var.environment}"
   image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
