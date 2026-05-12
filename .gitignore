@@ -1,0 +1,33 @@
+# Terraform core files
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+.terraform.tfstate.lock.info
+
+# Secrets and sensitive variables
+*.tfvars
+*.tfvars.json
+.env
+
+# Logs and debug files
+*.log
+crash.log
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.bak
+
+# Binaries and packages
+*.exe
+*.dll
+*.so
+node_modules/
+dist/
+bin/
