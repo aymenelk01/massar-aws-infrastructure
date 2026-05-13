@@ -22,3 +22,22 @@ module "endpoints" {
   aws_region             = var.aws_region
 }
 
+module "ecr" {
+  source      = "./modules/ecr"
+  environment = var.environment
+}
+
+module "cognito" {
+  source      = "./modules/cognito"
+  environment = var.environment
+}
+
+module "database" {
+  source                 = "./modules/database"
+  environment            = var.environment
+  private_db_subnet_ids  = module.vpc.private_db_subnet_ids
+  db_username           = var.db_username
+  db_password           = var.db_password
+  aurora_sg_id         = module.security.aurora_sg_id
+  rdsproxy_sg_id       = module.security.rdsproxy_sg_id
+}
