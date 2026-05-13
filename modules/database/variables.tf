@@ -10,27 +10,6 @@ variable "private_db_subnet_ids" {
     type = list(string)
 }
 
-# variable of the allocation storage for the RDS instance
-variable "allocated_storage" {
-    description = "The allocated storage for the RDS instance (in GB)"
-    type = number
-    default = 20
-}
-
-# variable of the database engine for the RDS instance
-variable "db_engine" {
-    description = "The database engine for the RDS instance (e.g., mysql, postgres)"
-    type = string
-    default = "mysql"
-}
-
-# variable of the instance class for the RDS instance
-variable "instance_class" {
-    description = "The instance class for the RDS instance (e.g., db.t3.micro)"
-    type = string
-    default = "db.t3.micro"
-}
-
 # variable of the database username for the RDS instance
 variable "db_username" {
     description = "The database username for the RDS instance"
@@ -44,14 +23,19 @@ variable "db_password" {
     sensitive = true
 }
 
-variable "rds_sg_id" {
-    description = "The ID of the security group for the RDS instance"
+variable "rdsproxy_sg_id" {
+    description = "The ID of the security group for the RDS Proxy"
     type = string
 }
 
-variable "rds_identifier" {
-    description = "The identifier for the RDS instance"
+variable "aurora_sg_id" {
+    description = "The identifier for the Aurora cluster security group"
     type = string
-    default = "db-instance"
   
 }
+
+variable "rdsproxy_sg_id" {
+    description = "The identifier for the RDS Proxy security group"
+    type = string
+}
+
