@@ -32,6 +32,7 @@ resource "aws_rds_cluster" "aurora" {
   }
 }
 
+# Create a RDS instance for the Aurora cluster, using the serverless v2 configuration for on-demand scaling based on workload demands
 resource "aws_rds_cluster_instance" "aurora_instance" {
   cluster_identifier = aws_rds_cluster.aurora.cluster_identifier
   identifier         = "aurora-instance-${var.environment}"
