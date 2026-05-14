@@ -41,3 +41,10 @@ module "database" {
   aurora_sg_id         = module.security.aurora_sg_id
   rdsproxy_sg_id       = module.security.rdsproxy_sg_id
 }
+
+module "cache" {
+  source                 = "./modules/cache"
+  environment            = var.environment
+  private_db_subnet_ids  = module.vpc.private_db_subnet_ids
+  elasticache_sg_id     = module.security.elasticache_sg_id
+}
