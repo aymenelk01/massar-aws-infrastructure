@@ -72,6 +72,7 @@ module "ecs" {
   rds_proxy_endpoint = module.database.rds_proxy_endpoint
   db_name = var.db_name
   ecr_repository_url = module.ecr.ecr_repository_url
+  documents_bucket_name = var.documents_bucket_name
   aws_region = var.aws_region
 }
 
