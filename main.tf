@@ -48,3 +48,38 @@ module "cache" {
   private_db_subnet_ids  = module.vpc.private_db_subnet_ids
   elasticache_sg_id     = module.security.elasticache_sg_id
 }
+
+module "loadbalancer" {
+  source = "./modules/loadbalancer"
+  environment = var.environment
+  vpc_id = module.vpc.vpc_id
+  alb_sg_id = module.security.alb_sg_id
+  public_subnet_ids = module.vpc.public_subnet_ids
+  certificate_arn = var.certificate_arn
+  logs_bucket_name = var.logs_bucket_name
+}
+
+module "ecs" {
+  source = "./modules/ecs"
+  environment = var.environment
+  vpc_id = module.vpc.vpc_id
+  private_app_subnet_ids = module.vpc.private_app_subnet_ids
+  ecs_sg_id = module.security.ecs_sg_id
+  target_group_arn = module.loadbalancer.target_group_arn
+  user_pool_id = module.cognito.user_pool_id
+  user_pool_client_id = module.cognito.user_pool_client_id
+  elasticache_replication_group_endpoint = module.cache.elasticache_replication_group_endpoint
+  rds_proxy_endpoint = module.database.rds_proxy_endpoint
+  db_name = var.db_name
+  ecr_repository_url = module.ecr.ecr_repository_url
+  aws_region = var.aws_region
+}
+
+module "storage" {
+  source = "./modules/storage"
+  environment = var.environment
+  documents_bucket_name = var.documents_bucket_name
+  state_bucket_name = var.state_bucket_name
+  logs_bucket_name = var.logs_bucket_name
+  
+}
