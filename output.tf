@@ -108,9 +108,9 @@ output "db_instance_id" {
 }
 
 # Storage outputs 
-output "static_bucket_name" {
-  description = "The name of the S3 bucket for static files"
-  value       = module.storage.static_bucket_name
+output "documents_bucket_name" {
+  description = "The name of the S3 bucket for documents files"
+  value       = module.storage.documents_bucket_name
 }
 
 output "state_bucket_name" {
@@ -123,17 +123,17 @@ output "logs_bucket_name" {
   value       = module.storage.logs_bucket_name
 }
 
-output "static_bucket_regional_domain_name" {
-  description = "The regional domain name of the S3 bucket for static files"
-  value       = module.storage.static_bucket_regional_domain_name
+output "documents_bucket_regional_domain_name" {
+  description = "The regional domain name of the S3 bucket for documents files"
+  value       = module.storage.documents_bucket_regional_domain_name
 }
 
 output "aws_cloudfront_distribution_id" {
   description = "The ID of the CloudFront distribution"
-  value = module.cloudfront.cloudfront_distribution_id
+  value       = module.cloudfront.cloudfront_distribution_id
 }
 
 output "cloudfront_domain_name" {
   description = "The domain name of the CloudFront distribution"
-  value = module.cloudfront.cloudfront_domain_name
+  value       = module.cloudfront.cloudfront_domain_name
 }
