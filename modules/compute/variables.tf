@@ -72,6 +72,12 @@ variable "target_group_arn" {
   description = "The ARN of the target group"
   type        = string
 }
+
+variable "documents_bucket_name" {
+  description = "The name of the S3 bucket for documents files"
+  type        = string
+}
+
 # variable of the AWS region
 variable "aws_region" {
   description = "The AWS region"
