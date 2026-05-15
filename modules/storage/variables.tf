@@ -10,6 +10,13 @@ variable "documents_bucket_name" {
   type        = string
 }
 
+# variable of the bucket name
+variable "static_bucket_name" {
+  description = "The name of the S3 bucket to create for static files"
+  default = "static_files_bucket_${var.environment}"
+  type        = string
+}
+
 # variable for the bucket name for state files
 variable "state_bucket_name" {
   description = "The name of the S3 bucket to create for state files"
