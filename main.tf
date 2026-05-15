@@ -79,6 +79,7 @@ module "storage" {
   source = "./modules/storage"
   environment = var.environment
   documents_bucket_name = var.documents_bucket_name
+  static_bucket_name = var.static_bucket_name
   state_bucket_name = var.state_bucket_name
   logs_bucket_name = var.logs_bucket_name
   
