@@ -48,3 +48,8 @@ variable "logs_bucket_name" {
   description = "The name of the S3 bucket to create for log files"
   type        = string
 }
+
+variable "cloudfront_prefix_list_id" {
+  description = "The ID of the AWS-managed prefix list for CloudFront"
+  type        = string
+}
