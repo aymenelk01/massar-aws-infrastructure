@@ -9,8 +9,3 @@ output "cloudfront_domain_name" {
   value       = aws_cloudfront_distribution.cdn.domain_name
   
 }
-
-output "cdn_arn" {
-  description = "The ARN of the CloudFront distribution for the CDN"
-  value       = aws_cloudfront_distribution.cdn.arn
-}

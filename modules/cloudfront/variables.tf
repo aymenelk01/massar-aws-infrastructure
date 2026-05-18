@@ -10,13 +10,13 @@ variable "static_bucket_regional_domain_name" {
 variable "static_bucket_arn" {
   description = "The ARN of the S3 bucket for static files"
   type        = string
-}   
+}
 
 # variable of the static bucket id
 variable "static_bucket_id" {
   description = "The ID of the S3 bucket for static files"
   type        = string
-  
+
 }
 
 # variable of the dns name of the ALB
