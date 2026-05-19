@@ -31,6 +31,7 @@ resource "aws_ecs_task_definition" "task_definition" {
   memory                   = "512"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
+
   container_definitions = jsonencode([
     {
       name      = "massar-app"
@@ -52,6 +53,7 @@ resource "aws_ecs_task_definition" "task_definition" {
         { name = "ELASTICACHE_ENDPOINT", value = var.elasticache_replication_group_endpoint },
         { name = "RDS_PROXY_ENDPOINT", value = var.rds_proxy_endpoint },
         { name = "DB_NAME", value = var.db_name },
+        { name = "SQS_QUEUE_URL", value = var.sqs_queue_url },
         { name = "ENVIRONMENT", value = var.environment }
       ]
 
@@ -69,17 +71,17 @@ resource "aws_ecs_task_definition" "task_definition" {
 
 # Create an ECS Service to run the tasks and manage the desired count of tasks for high availability and scalability
 resource "aws_ecs_service" "service" {
-  name            = "${var.environment}-service"
-  cluster         = aws_ecs_cluster.cluster.id
-  task_definition = aws_ecs_task_definition.task_definition.arn
-  desired_count   = 2 # Set the desired count of tasks to 2 for high availability, but adjust this value based on your application's needs and traffic patterns
-  launch_type     = "FARGATE"
+  name                   = "${var.environment}-service"
+  cluster                = aws_ecs_cluster.cluster.id
+  task_definition        = aws_ecs_task_definition.task_definition.arn
+  desired_count          = 2 # Set the desired count of tasks to 2 for high availability, but adjust this value based on your application's needs and traffic patterns
+  launch_type            = "FARGATE"
   enable_execute_command = true # Enable execute command for remote debugging and management of the tasks, which allows you to run commands in the container without needing to SSH into the underlying EC2 instances, providing a more secure and efficient way to troubleshoot and manage your application tasks
 
 
   network_configuration {
-    subnets         = var.private_app_subnet_ids
-    security_groups = [var.ecs_sg_id]
+    subnets          = var.private_app_subnet_ids
+    security_groups  = [var.ecs_sg_id]
     assign_public_ip = false # Set to true if you want to assign public IPs to the tasks, but it's recommended to keep it false for better security and use a NAT gateway for outbound internet access if needed
   }
 
@@ -93,5 +95,5 @@ resource "aws_ecs_service" "service" {
     Name        = "ECSService-${var.environment}"
     Environment = var.environment
   }
-  
+
 }
