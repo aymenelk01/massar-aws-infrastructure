@@ -9,21 +9,26 @@ resource "aws_db_subnet_group" "db_subnet_group" {
 }
 
 resource "aws_rds_cluster" "aurora" {
-  cluster_identifier          = "aurora-cluster-${var.environment}"
-  engine                      = "aurora-mysql"
-  engine_mode                 = "provisioned"
-  engine_version              = "8.0.mysql_aurora.3.12.0"
-  database_name               = "massardb"
-  master_username             = var.db_username
-  master_password             = var.db_password
-  storage_encrypted           = true
-  vpc_security_group_ids      = [var.aurora_sg_id]
-  db_subnet_group_name        = aws_db_subnet_group.db_subnet_group.name
+  cluster_identifier              = "aurora-cluster-${var.environment}"
+  engine                          = "aurora-mysql"
+  engine_mode                     = "provisioned"
+  engine_version                  = "8.0.mysql_aurora.3.12.0"
+  database_name                   = "massardb"
+  master_username                 = var.db_username
+  master_password                 = var.db_password
+  storage_encrypted               = true
+  vpc_security_group_ids          = [var.aurora_sg_id]
+  db_subnet_group_name            = aws_db_subnet_group.db_subnet_group.name
+  enabled_cloudwatch_logs_exports = ["error", "slowquery"]
+  depends_on = [
+    aws_cloudwatch_log_group.aurora_error_logs,
+    aws_cloudwatch_log_group.aurora_slowquery_logs
+  ]
 
 
   serverlessv2_scaling_configuration {
-    max_capacity             = 64
-    min_capacity             = 0.5
+    max_capacity = 64
+    min_capacity = 0.5
   }
 
   tags = {

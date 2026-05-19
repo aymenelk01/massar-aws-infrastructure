@@ -33,9 +33,3 @@ variable "aurora_sg_id" {
     type = string
   
 }
-
-variable "rdsproxy_sg_id" {
-    description = "The identifier for the RDS Proxy security group"
-    type = string
-}
-
