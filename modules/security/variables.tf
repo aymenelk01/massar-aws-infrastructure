@@ -14,6 +14,5 @@ variable "vpc_id" {
 variable "cloudfront_prefix_list_id" {
     description = "The ID of the AWS-managed prefix list for CloudFront"
     type = string
-    default = "pl-1bbc5972"
 }
 
