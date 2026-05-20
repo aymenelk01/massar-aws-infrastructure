@@ -10,30 +10,35 @@ variable "aws_region" {
   type        = string
 }
 
+# variable of the database name
+variable "db_name" {
+    description = "The name of the database"
+    type = string
+}
+
 # variable of the database username for the RDS instance
 variable "db_username" {
-    description = "The database username for the RDS instance"
-    type = string
+  description = "The database username for the RDS instance"
+  type        = string
 }
 
 # variable of the database password for the RDS instance
 variable "db_password" {
-    description = "The database password for the RDS instance"
-    type = string
-    sensitive = true
+  description = "The database password for the RDS instance"
+  type        = string
+  sensitive   = true
 }
 
 # variable of the bucket name
 variable "documents_bucket_name" {
   description = "The name of the S3 bucket to create for documents"
-  default = "documents_bucket_${var.environment}"
+  default     = "documents_bucket_dev"
   type        = string
 }
 
 # variable of the bucket name
 variable "static_bucket_name" {
   description = "The name of the S3 bucket to create for static files"
-  default = "static_files_bucket_${var.environment}"
   type        = string
 }
 
@@ -51,5 +56,10 @@ variable "logs_bucket_name" {
 
 variable "cloudfront_prefix_list_id" {
   description = "The ID of the AWS-managed prefix list for CloudFront"
+  type        = string
+}
+
+variable "certificate_arn" {
+  description = "The ARN of the SSL certificate to create for the ALB"
   type        = string
 }
