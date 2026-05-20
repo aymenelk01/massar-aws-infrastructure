@@ -9,6 +9,11 @@ variable "private_db_subnet_ids" {
     description = "List of private database subnet IDs"
     type = list(string)
 }
+# variable of db name
+variable "db_name" {
+    description = "The name of the database"
+    type = string
+}
 
 # variable of the database username for the RDS instance
 variable "db_username" {

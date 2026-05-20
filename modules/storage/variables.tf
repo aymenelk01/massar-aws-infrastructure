@@ -6,14 +6,12 @@ variable "environment" {
 # variable of the bucket name
 variable "documents_bucket_name" {
   description = "The name of the S3 bucket to create for documents"
-  default = "documents_bucket_${var.environment}"
   type        = string
 }
 
 # variable of the bucket name
 variable "static_bucket_name" {
   description = "The name of the S3 bucket to create for static files"
-  default = "static_files_bucket_${var.environment}"
   type        = string
 }
 

@@ -13,7 +13,7 @@ resource "aws_rds_cluster" "aurora" {
   engine                          = "aurora-mysql"
   engine_mode                     = "provisioned"
   engine_version                  = "8.0.mysql_aurora.3.12.0"
-  database_name                   = "massardb"
+  database_name                   = var.db_name
   master_username                 = var.db_username
   master_password                 = var.db_password
   storage_encrypted               = true
