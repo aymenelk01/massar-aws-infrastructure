@@ -72,8 +72,10 @@ module "compute" {
   elasticache_replication_group_endpoint = module.cache.elasticache_replication_group_endpoint
   rds_proxy_endpoint                     = module.database.rds_proxy_endpoint
   db_name                                = var.db_name
+  db_secret_arn                          = module.database.db_secret_arn
   ecr_repository_url                     = module.ecr.ecr_repository_url
   sqs_queue_url                          = module.notifications.sqs_queue_url
+  sqs_queue_arn                          = module.notifications.sqs_queue_arn
   documents_bucket_name                  = var.documents_bucket_name
   aws_region                             = var.aws_region
 }
