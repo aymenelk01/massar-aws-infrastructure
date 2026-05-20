@@ -67,6 +67,16 @@ variable "sqs_queue_url" {
   type        = string
 }
 
+variable "sqs_queue_arn" {
+  description = "The ARN of the SQS queue"
+  type        = string
+}
+
+variable "db_secret_arn" {
+  description = "The ARN of the database secret in Secrets Manager"
+  type = string
+}
+
 # variable of the AWS region
 variable "aws_region" {
   description = "The AWS region"

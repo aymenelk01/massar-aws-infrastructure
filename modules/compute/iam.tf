@@ -16,9 +16,9 @@ resource "aws_iam_role" "ecs_task_execution_role" {
       }
     ]
   })
-  
+
   tags = {
-    Name = "ecsRole-${var.environment}"
+    Name        = "ecsRole-${var.environment}"
     Environment = var.environment
   }
 }
@@ -72,12 +72,12 @@ resource "aws_iam_role" "ecs_task_role" {
   })
 
   tags = {
-    Name = "ecsTaskRole-${var.environment}"
+    Name        = "ecsTaskRole-${var.environment}"
     Environment = var.environment
   }
 }
 
-# create a custom policy for the ECS role to allow it to access the ssm messages for ECS Exec
+# create a custom policy for the ECS role to allow it to access the S3 bucket for the documents files
 resource "aws_iam_role_policy" "ecs_task_policy" {
   name = "ecs-task-policy-${var.environment}"
   role = aws_iam_role.ecs_task_role.id
@@ -92,6 +92,22 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
           "s3:DeleteObject",
         ]
         Resource = "arn:aws:s3:::${var.documents_bucket_name}/*"
+      },
+
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage",
+        ]
+        Resource = var.sqs_queue_arn
+      },
+
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+        ]
+        Resource = var.db_secret_arn
       }
     ]
   })

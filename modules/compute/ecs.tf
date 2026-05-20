@@ -54,7 +54,9 @@ resource "aws_ecs_task_definition" "task_definition" {
         { name = "RDS_PROXY_ENDPOINT", value = var.rds_proxy_endpoint },
         { name = "DB_NAME", value = var.db_name },
         { name = "SQS_QUEUE_URL", value = var.sqs_queue_url },
-        { name = "ENVIRONMENT", value = var.environment }
+        { name = "DB_SECRET_ARN", value = var.db_secret_arn },
+        { name = "ENVIRONMENT", value = var.environment },
+        { name = "AWS_REGION", value = var.aws_region }
       ]
 
       logConfiguration = {
