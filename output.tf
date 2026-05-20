@@ -4,21 +4,6 @@ output "vpc_id" {
   value       = module.vpc.vpc_id
 }
 
-output "internet_gateway_id" {
-  description = "The ID of the Internet Gateway"
-  value       = module.vpc.internet_gateway_id
-}
-
-output "nat_gateway_ids" {
-  description = "The IDs of the NAT Gateways"
-  value       = module.vpc.nat_gateway_id
-}
-
-output "nat_eip_ids" {
-  description = "The IDs of the NAT Elastic IPs"
-  value       = module.vpc.nat_eip_id
-}
-
 output "public_subnet_ids" {
   description = "List of public subnet IDs"
   value       = module.vpc.public_subnet_ids
@@ -34,77 +19,49 @@ output "private_db_subnet_ids" {
   value       = module.vpc.private_db_subnet_ids
 }
 
-output "availability_zones" {
-  description = "List of availability zones"
-  value       = module.vpc.availability_zones
-}
-
-output "public_route_table_id" {
-  description = "The ID of the public route table"
-  value       = module.vpc.public_route_table_id
-}
-
-output "app_route_table_ids" {
-  description = "The IDs of the app route tables"
-  value       = module.vpc.app_route_table_id
-}
-
-output "db_route_table_id" {
-  description = "The ID of the DB route table"
-  value       = module.vpc.db_route_table_id
-}
-
 # Security Group outputs
 output "alb_sg_id" {
   description = "The ID of the ALB security group"
   value       = module.security.alb_sg_id
 }
 
-output "ec2_sg_id" {
-  description = "The ID of the EC2 security group"
-  value       = module.security.ec2_sg_id
+output "ecs_sg_id" {
+  description = "The ID of the ECS security group"
+  value       = module.security.ecs_sg_id
 }
 
-output "rds_sg_id" {
-  description = "The ID of the RDS security group"
-  value       = module.security.rds_sg_id
+# ECR outputs
+output "ecr_repository_url" {
+  description = "The URL of the ECR repository"
+  value       = module.ecr.ecr_repository_url
 }
 
-# Compute outputs
+# alb outputs
 output "alb_dns_name" {
   description = "The DNS name of the ALB"
-  value       = module.compute.alb_dns_name
+  value       = module.loadbalancer.alb_dns_name
 }
 
 output "alb_arn" {
   description = "The ARN of the ALB"
-  value       = module.compute.alb_arn
-}
-
-output "ec2_launch_template_id" {
-  description = "The ID of the EC2 launch template"
-  value       = module.compute.launch_template_id
+  value       = module.loadbalancer.alb_arn
 }
 
 output "target_group_arn" {
   description = "The ARN of the target group for the ALB"
-  value       = module.compute.target_group_arn
+  value       = module.loadbalancer.target_group_arn
 }
 
-output "asg_id" {
-  description = "The ID of the auto scaling group for the EC2 instances"
-  value       = module.compute.asg_id
-}
 
 # Database outputs
-output "db_instance_endpoint" {
-  description = "The endpoint of the RDS instance"
-  value       = module.database.db_instance_endpoint
+output "aurora_cluster_endpoint" {
+  description = "The endpoint of the Aurora cluster"
+  value       = module.database.aurora_cluster_endpoint
 }
 
-output "db_instance_id" {
-  description = "The ID of the RDS instance"
-  value       = module.database.db_instance_id
+output "rds_proxy_endpoint" {
+  description = "The endpoint of the RDS Proxy"
+  value       = module.database.rds_proxy_endpoint
 }
 
 # Storage outputs 
@@ -128,6 +85,7 @@ output "documents_bucket_regional_domain_name" {
   value       = module.storage.documents_bucket_regional_domain_name
 }
 
+# cloudfront outputs
 output "aws_cloudfront_distribution_id" {
   description = "The ID of the CloudFront distribution"
   value       = module.cloudfront.cloudfront_distribution_id
@@ -136,4 +94,26 @@ output "aws_cloudfront_distribution_id" {
 output "cloudfront_domain_name" {
   description = "The domain name of the CloudFront distribution"
   value       = module.cloudfront.cloudfront_domain_name
+}
+
+# notifications outputs
+output "sqs_queue_url" {
+  description = "The URL of the SQS queue"
+  value       = module.notifications.sqs_queue_url
+}
+
+output "sns_topic_arn" {
+  description = "The ARN of the SNS topic for notifications"
+  value       = module.notifications.sns_topic_arn
+}
+
+# cognito outputs
+output "user_pool_id" {
+  description = "The ID of the Cognito User Pool"
+  value       = module.cognito.user_pool_id
+}
+
+output "user_pool_client_id" {
+  description = "The ID of the Cognito User Pool Client"
+  value       = module.cognito.user_pool_client_id 
 }
