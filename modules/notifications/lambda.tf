@@ -8,12 +8,12 @@ data "archive_file" "lambda_zip" {
   output_path = "${path.module}/lambda_function.zip"
 }
 
-# create the AWS Lambda function resource. The function_name is set based on the environment variable, and the role is assigned from the IAM role created in the iam.tf file. The handler specifies the entry point for the Lambda function, and the runtime is set to Python 3.8. The timeout and memory_size are configurable through variables. The source_code_hash ensures that the Lambda function is updated whenever the code changes.
+# create the AWS Lambda function resource. The function_name is set based on the environment variable, and the role is assigned from the IAM role created in the iam.tf file. The handler specifies the entry point for the Lambda function, and the runtime is set to Python 3.12. The timeout and memory_size are configurable through variables. The source_code_hash ensures that the Lambda function is updated whenever the code changes.
 resource "aws_lambda_function" "notifications_lambda" {
   function_name    = "${var.environment}-notifications-lambda"
   role             = aws_iam_role.lambda_role.arn
   handler          = "lambda_function.lambda_handler"
-  runtime          = "python3.8"
+  runtime          = "python3.12"
   timeout          = var.lambda_timeout
   memory_size      = var.lambda_memory_size
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
