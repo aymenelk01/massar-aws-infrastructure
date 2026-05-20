@@ -16,11 +16,7 @@ variable "private_app_subnet_ids" {
   type        = list(string)
 }
 
-# variable of the documents files bucket ARN
-variable "documents_bucket_arn" {
-  description = "The ARN of the S3 bucket to create for documents files"
-  type        = string
-}
+
 
 variable "user_pool_id" {
   description = "The ID of the Cognito User Pool"
