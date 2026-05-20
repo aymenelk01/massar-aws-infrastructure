@@ -16,18 +16,6 @@ variable "private_app_subnet_ids" {
   type        = list(string)
 }
 
-# variable of the dynamodb table name
-variable "dynamodb_session_table_arn" {
-  description = "The ARN of the DynamoDB table to create for storing application data"
-  type        = string
-}
-
-# variable of the dyanamodb table of the user table
-variable "dynamodb_user_table_arn" {
-  description = "The ARN of the DynamoDB user table to create for storing user data"
-  type        = string
-}
-
 # variable of the documents files bucket ARN
 variable "documents_bucket_arn" {
   description = "The ARN of the S3 bucket to create for documents files"
