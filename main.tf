@@ -36,6 +36,7 @@ module "database" {
   source                = "./modules/database"
   environment           = var.environment
   private_db_subnet_ids = module.vpc.private_db_subnet_ids
+  db_name               = var.db_name
   db_username           = var.db_username
   db_password           = var.db_password
   aurora_sg_id          = module.security.aurora_sg_id
@@ -59,8 +60,8 @@ module "loadbalancer" {
   logs_bucket_name  = var.logs_bucket_name
 }
 
-module "ecs" {
-  source                                 = "./modules/ecs"
+module "compute" {
+  source                                 = "./modules/compute"
   environment                            = var.environment
   vpc_id                                 = module.vpc.vpc_id
   private_app_subnet_ids                 = module.vpc.private_app_subnet_ids
@@ -72,6 +73,7 @@ module "ecs" {
   rds_proxy_endpoint                     = module.database.rds_proxy_endpoint
   db_name                                = var.db_name
   ecr_repository_url                     = module.ecr.ecr_repository_url
+  sqs_queue_url                          = module.notifications.sqs_queue_url
   documents_bucket_name                  = var.documents_bucket_name
   aws_region                             = var.aws_region
 }
@@ -99,4 +101,10 @@ module "cloudfront" {
     aws           = aws
     aws.us_east_1 = aws.us_east_1
   }
+}
+
+module "notifications" {
+  source      = "./modules/notifications"
+  environment = var.environment
+  aws_region  = var.aws_region
 }
