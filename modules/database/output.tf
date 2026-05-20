@@ -7,6 +7,11 @@ output "aurora_cluster_endpoint" {
   description = "The endpoint of the Aurora cluster"
   value       = aws_rds_cluster.aurora.endpoint
 }
+  
+output "db_secret_arn" {
+  description = "The ARN of the database secret"
+  value       = aws_secretsmanager_secret.credential_secret.arn
+}
 
 output "db_name" {
   description = "the name of the database"
