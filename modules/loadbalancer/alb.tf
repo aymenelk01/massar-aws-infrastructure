@@ -9,13 +9,13 @@ resource "aws_lb" "alb" {
   subnets            = var.public_subnet_ids
 
   access_logs {
-    bucket  = var.logs_bucket_name
+    bucket  = "${var.environment}-${var.logs_bucket_name}"
     prefix  = "alb-logs"
     enabled = true
   }
 
   tags = {
-    Name = "ALB-${var.environment}"
+    Name        = "ALB-${var.environment}"
     Environment = var.environment
   }
 
@@ -24,9 +24,9 @@ resource "aws_lb" "alb" {
 # create a target group for the ALB to receive traffic from the listener and forward it to the ECS on port 80 in the private subnets
 resource "aws_lb_target_group" "target" {
   name        = "TargetGroup-${var.environment}"
-  port        = 80
+  port        = 3000 # the port on which the target group receives traffic from the ALB, which should match the port defined in the container definition and the port exposed in the Dockerfile
   protocol    = "HTTP"
-  vpc_id      = var.vpc_id 
+  vpc_id      = var.vpc_id
   target_type = "ip"
 
   health_check {
@@ -46,7 +46,7 @@ resource "aws_lb_listener" "frontend" {
   load_balancer_arn = aws_lb.alb.arn
   port              = 443
   protocol          = "HTTPS"
-  certificate_arn = var.certificate_arn # uncomment this line and provide the ARN of the SSL certificate to enable HTTPS for the ALB
+  certificate_arn   = var.certificate_arn # uncomment this line and provide the ARN of the SSL certificate to enable HTTPS for the ALB
 
 
   default_action {
@@ -69,6 +69,6 @@ resource "aws_lb_listener" "http_listener" {
       protocol    = "HTTPS"
       status_code = "HTTP_301"
     }
-   }
-  
+  }
+
 }
