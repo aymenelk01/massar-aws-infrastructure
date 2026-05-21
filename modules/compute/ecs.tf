@@ -42,8 +42,9 @@ resource "aws_ecs_task_definition" "task_definition" {
 
       portMappings = [
         {
-          containerPort = 80
-          hostPort      = 80
+          containerPort = 3000 # The port on which the container listens for traffic, which should match the port defined in the target group configuration and the port exposed in the Dockerfile
+          hostPort      = 3000 # The port on the host that is mapped to the container port, which should match the port defined in the target group configuration and the port exposed in the Dockerfile
+          protocol      = "tcp"
         }
       ]
 
