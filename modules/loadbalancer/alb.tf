@@ -21,7 +21,7 @@ resource "aws_lb" "alb" {
 
 }
 
-# create a target group for the ALB to receive traffic from the listener and forward it to the ECS on port 80 in the private subnets
+# create a target group for the ALB to receive traffic from the listener and forward it to the ECS on port 3000 in the private subnets
 resource "aws_lb_target_group" "target" {
   name        = "TargetGroup-${var.environment}"
   port        = 3000 # the port on which the target group receives traffic from the ALB, which should match the port defined in the container definition and the port exposed in the Dockerfile
@@ -31,7 +31,7 @@ resource "aws_lb_target_group" "target" {
 
   health_check {
     enabled             = true
-    path                = "/"   # specify the path for the health check (e.g., the root path of the application)
+    path                = "/health"   # specify the path for the health check (e.g., the root path of the application)
     interval            = 30    # check every 30 seconds
     timeout             = 5     # consider the target unhealthy if it does not respond within 5 seconds
     healthy_threshold   = 3     # consider the target healthy after 3 consecutive successful health checks
