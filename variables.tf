@@ -63,3 +63,18 @@ variable "certificate_arn" {
   description = "The ARN of the SSL certificate to create for the ALB"
   type        = string
 }
+
+variable "oidc_role_name" {
+    description = "The name of the IAM role to create for GitHub Actions OIDC authentication"
+    type        = string
+}
+
+variable "github_repo_name" {
+    description = "The name of the GitHub repository (e.g., aymenelk01/massar-aws-infrastructure)"
+    type        = string
+}
+
+variable "github_username" {
+    description = "The GitHub username for the repository (e.g., aymenelk01)"
+    type        = string
+}

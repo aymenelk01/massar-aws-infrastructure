@@ -110,3 +110,11 @@ module "notifications" {
   environment = var.environment
   aws_region  = var.aws_region
 }
+
+module "oidc" {
+  source      = "./modules/OIDC"
+  environment = var.environment
+  github_username    = var.github_username
+  github_repo_name   = var.github_repo_name
+  oidc_role_name   = var.oidc_role_name
+}

@@ -117,3 +117,10 @@ output "user_pool_client_id" {
   description = "The ID of the Cognito User Pool Client"
   value       = module.cognito.user_pool_client_id 
 }
+
+
+# OIDC outputs
+output "iam_role_arn" {
+    value = module.oidc.github_actions_role.arn
+    description = "The ARN of the IAM role for GitHub Actions OIDC authentication"
+}
