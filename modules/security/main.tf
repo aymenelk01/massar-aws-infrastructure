@@ -24,16 +24,16 @@ resource "aws_security_group" "alb_sg" {
   }
 }
 
-## Create security group for the ECS instances and allow inbound traffic on ports 80 and 443 from the ALB security group, and allow all outbound traffic
+## Create security group for the ECS instances and allow inbound traffic on ports 3000 from the ALB security group, and allow all outbound traffic
 resource "aws_security_group" "ecs_sg" {
   name        = "ECS-SG-${var.environment}"
   description = "Security group for the ECS instances"
   vpc_id      = var.vpc_id
 
-  # allow traffic from the ALB security group on port 80
+  # allow traffic from the ALB security group on port 3000
   ingress {
-    from_port       = 80
-    to_port         = 80
+    from_port       = 3000
+    to_port         = 3000
     protocol        = "tcp"
     security_groups = [aws_security_group.alb_sg.id] # allow traffic from the ALB security group
   }
