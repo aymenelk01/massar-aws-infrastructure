@@ -23,7 +23,7 @@ resource "aws_ecs_cluster" "cluster" {
 }
 
 # Create an ecs task definition for the application, specifying the container image, resource requirements, environment variables, and log configurationuration to send logs to CloudWatch Logs for monitoring and troubleshooting purposes
-resource "aws_ecs_task_definition" "task_definition" {
+resource "aws_ecs_task_definition" "app" {
   family                   = "${var.environment}-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
@@ -76,7 +76,7 @@ resource "aws_ecs_task_definition" "task_definition" {
 resource "aws_ecs_service" "service" {
   name                   = "${var.environment}-service"
   cluster                = aws_ecs_cluster.cluster.id
-  task_definition        = aws_ecs_task_definition.task_definition.arn
+  task_definition        = aws_ecs_task_definition.app.arn
   desired_count          = 2 # Set the desired count of tasks to 2 for high availability, but adjust this value based on your application's needs and traffic patterns
   launch_type            = "FARGATE"
   enable_execute_command = true # Enable execute command for remote debugging and management of the tasks, which allows you to run commands in the container without needing to SSH into the underlying EC2 instances, providing a more secure and efficient way to troubleshoot and manage your application tasks
@@ -91,7 +91,7 @@ resource "aws_ecs_service" "service" {
   load_balancer {
     target_group_arn = var.target_group_arn
     container_name   = "massar-app"
-    container_port   = 80 # The port on which the container listens for traffic, which should match the port defined in the container definition and the target group configuration
+    container_port   = 3000 # The port on which the container listens for traffic, which should match the port defined in the container definition and the target group configuration
   }
 
   tags = {
