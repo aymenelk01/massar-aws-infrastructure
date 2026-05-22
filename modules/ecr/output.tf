@@ -3,3 +3,9 @@ output "ecr_repository_url" {
     value       = aws_ecr_repository.massar_repo.repository_url
   
 }
+
+output "ecr_repository_arn" {
+    description = "The ARN of the ECR repository"
+    value       = aws_ecr_repository.massar_repo.arn
+  
+}
