@@ -3,7 +3,17 @@ variable "environment" {
     type        = string
 }
 
-variable "oidc_role_name" {
+variable "aws_region" {
+    description = "The AWS region where the resources will be created"
+    type        = string
+}
+
+variable "oidc_terraform_role_name" {
+    description = "The name of the IAM role to create for GitHub Actions OIDC authentication"
+    type        = string
+}
+
+variable "oidc_deploy_role_name" {
     description = "The name of the IAM role to create for GitHub Actions OIDC authentication"
     type        = string
 }
@@ -23,3 +33,29 @@ variable "github_username" {
     description = "The GitHub username for the repository (e.g., aymenelk01)"
     type        = string
 }
+
+variable "static_bucket_name" {
+  description = "The name of the S3 bucket to create for static files"
+  type        = string
+}
+
+variable "ecr_repository_arn" {
+  description = "The ARN of the ECR repository"
+  type        = string
+}
+
+variable "ecs_service_arn" {
+  description = "The ARN of the ECS service"
+  type        = string
+}
+
+variable "iam_role_execution_arn" {
+  description = "The ARN of the IAM role for ECS execution"
+  type        = string
+}
+
+variable "iam_role_task_arn" {
+  description = "The ARN of the IAM role for ECS tasks"
+  type        = string
+}
+
