@@ -119,9 +119,5 @@ module "oidc" {
   oidc_terraform_role_name = var.oidc_terraform_role_name
   oidc_deploy_role_name    = var.oidc_deploy_role_name
   static_bucket_name       = var.static_bucket_name
-  ecr_repository_arn       = module.ecr.ecr_repository_arn
-  ecs_service_arn          = module.compute.ecs_service_arn
-  iam_role_execution_arn   = module.compute.iam_role_execution_arn
-  iam_role_task_arn        = module.compute.iam_role_task_arn
   aws_region               = var.aws_region
 }
