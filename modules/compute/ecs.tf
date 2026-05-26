@@ -35,7 +35,7 @@ resource "aws_ecs_task_definition" "app" {
   container_definitions = jsonencode([
     {
       name      = "massar-app"
-      image     = "${var.ecr_repository_url}:latest"
+      image = "public.ecr.aws/docker/library/node:alpine"
       cpu       = 256
       memory    = 512
       essential = true
