@@ -64,7 +64,12 @@ variable "certificate_arn" {
   type        = string
 }
 
-variable "oidc_role_name" {
+variable "oidc_terraform_role_name" {
+    description = "The name of the IAM role to create for GitHub Actions OIDC authentication"
+    type        = string
+}
+
+variable "oidc_deploy_role_name" {
     description = "The name of the IAM role to create for GitHub Actions OIDC authentication"
     type        = string
 }
