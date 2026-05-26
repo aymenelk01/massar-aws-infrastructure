@@ -137,7 +137,7 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
 
       # S3 Access - scoped to the static bucket only
       {
-        sid    = "S3StaticBucketAccess"
+        Sid    = "S3StaticBucketAccess"
         Effect = "Allow"
         Action = [
           "s3:PutObject",
@@ -147,7 +147,7 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
         Resource = "arn:aws:s3:::${var.static_bucket_name}/*"
       },
       {
-        sid    = "S3StaticBucketList"
+        Sid    = "S3StaticBucketList"
         Effect = "Allow"
         Action = [
           "s3:ListBucket"
@@ -157,7 +157,7 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
 
       #ECR Authentication - must be * (account-level action, cannot be scoped to a single repo)
       {
-        sid    = "ECRAuthorizationToken"
+        Sid    = "ECRAuthorizationToken"
         Effect = "Allow"
         Action = [
           "ecr:GetAuthorizationToken"
@@ -167,7 +167,7 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
 
       # ECR Push - scoped to Massar ECR repository only
       {
-        sid    = "ECRPull"
+        Sid    = "ECRPull"
         Effect = "Allow"
         Action = [
           "ecr:BatchCheckLayerAvailability",
@@ -183,7 +183,7 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
 
       # ECS Service Management - scoped to Massar service ARN
       {
-        sid    = "ECSDeploy"
+        Sid    = "ECSDeploy"
         Effect = "Allow"
         Action = [
           "ecs:UpdateService",
@@ -196,7 +196,7 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
 
       # ECS Task Definition Management - must be * due to AWS IAM API design
       {
-        sid    = "ECSDeployRegisterTaskDefinition"
+        Sid    = "ECSDeployRegisterTaskDefinition"
         Effect = "Allow"
         Action = [
           "ecs:DescribeTaskDefinition",
@@ -207,7 +207,7 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
 
       # IAM PassRole - scoped to the ECS task execution role only
       {
-        sid    = "PassRole"
+        Sid    = "PassRole"
         Effect = "Allow"
         Action = [
           "iam:PassRole"
