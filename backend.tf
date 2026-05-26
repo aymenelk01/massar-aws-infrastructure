@@ -1,11 +1,10 @@
-/*
+
 terraform {
   backend "s3" {
-    bucket         = "dev-aymenelk01-state-files"
+    bucket         = "dev-app-massar-state"
     key            = "terraform.tfstate"
     region         = "eu-south-1"
-    dynamodb_table = "terraform-lock-dev"
+    use_lockfile = true # Enables native S3 state locking
     encrypt        = true
   }
 }
-*/
