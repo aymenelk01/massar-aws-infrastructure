@@ -39,23 +39,3 @@ variable "static_bucket_name" {
   type        = string
 }
 
-variable "ecr_repository_arn" {
-  description = "The ARN of the ECR repository"
-  type        = string
-}
-
-variable "ecs_service_arn" {
-  description = "The ARN of the ECS service"
-  type        = string
-}
-
-variable "iam_role_execution_arn" {
-  description = "The ARN of the IAM role for ECS execution"
-  type        = string
-}
-
-variable "iam_role_task_arn" {
-  description = "The ARN of the IAM role for ECS tasks"
-  type        = string
-}
-
