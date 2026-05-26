@@ -49,8 +49,8 @@ resource "aws_iam_role_policy_attachment" "github_actions_policy_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
 }
 
-resource "aws_iam_role_policy" "github_actions_custom_policy" {
-  name = "github-actions-custom-policy-${var.environment}"
+resource "aws_iam_role_policy" "terraform_pipeline_custom_policy" {
+  name = "terraform-pipeline-custom-policy-${var.environment}"
   role = aws_iam_role.terraform_role.id
   policy = jsonencode({
     Version = "2012-10-17"
@@ -129,7 +129,7 @@ resource "aws_iam_role" "deploy_role" {
 }
 
 resource "aws_iam_role_policy" "deploy_custom_policy" {
-  name = "github-actions-custom-policy-${var.environment}"
+  name = "deploy-pipeline-custom-policy-${var.environment}"
   role = aws_iam_role.deploy_role.id
   policy = jsonencode({
     Version = "2012-10-17"
