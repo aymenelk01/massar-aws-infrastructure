@@ -178,7 +178,7 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
           "ecr:CompleteLayerUpload",
           "ecr:PutImage"
         ]
-        Resource = "${var.ecr_repository_arn}"
+        Resource = "arn:aws:ecr:${var.aws_region}:${data.aws_caller_identity.current.account_id}:repository/ecr-repository-${var.environment}"
       },
 
       # ECS Service Management - scoped to Massar service ARN
@@ -190,7 +190,7 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
           "ecs:DescribeServices"
         ]
         Resource = [
-          "${var.ecs_service_arn}"
+          "arn:aws:ecs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:service/${var.environment}-cluster/${var.environment}-service"
         ]
       },
 
@@ -213,8 +213,8 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
           "iam:PassRole"
         ]
         Resource = [
-          "${var.iam_role_execution_arn}",
-          "${var.iam_role_task_arn}"
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ecsRole-${var.environment}",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ecsTaskRole-${var.environment}"
         ]
       }
     ]
