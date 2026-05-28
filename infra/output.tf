@@ -119,13 +119,3 @@ output "user_pool_client_id" {
 }
 
 
-# OIDC outputs
-output "iam_deploy_role_arn" {
-    value = module.oidc.deploy_role_arn
-    description = "The ARN of the IAM role for deploy OIDC authentication"
-}
-
-output "iam_terraform_role_arn" {
-    value = module.oidc.terraform_role_arn
-    description = "The ARN of the IAM role for Terraform OIDC authentication"
-}

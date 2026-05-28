@@ -110,14 +110,3 @@ module "notifications" {
   environment = var.environment
   aws_region  = var.aws_region
 }
-
-module "oidc" {
-  source                   = "./modules/OIDC"
-  environment              = var.environment
-  github_username          = var.github_username
-  github_repo_name         = var.github_repo_name
-  oidc_terraform_role_name = var.oidc_terraform_role_name
-  oidc_deploy_role_name    = var.oidc_deploy_role_name
-  static_bucket_name       = var.static_bucket_name
-  aws_region               = var.aws_region
-}
