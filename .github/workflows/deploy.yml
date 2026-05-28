@@ -1,0 +1,60 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: eu-south-1
+      ECS_CLUSTER: dev-cluster
+      ECS_SERVICE: dev-service
+      S3_BUCKET_NAME: app-massar-static
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: github-actions-deploy
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set image URI
+        run: echo "IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/ecr-repository-dev" >> $GITHUB_ENV  
+
+      - name: Build the Docker image
+        run: docker build -t $IMAGE_URI:${{ github.sha }} -t $IMAGE_URI:latest ./app
+
+      - name: Push the Docker image
+        run: |
+          docker push $IMAGE_URI:${{ github.sha }} 
+          docker push $IMAGE_URI:latest
+      
+      - name: Update ECS service
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --force-new-deployment    
+      
+      - name: Wait for deployment to complete
+        run: |
+          aws ecs wait services-stable \
+            --cluster $ECS_CLUSTER \
+            --services $ECS_SERVICE      
+
+      - name: upload static files to S3
+        run: |
+          aws s3 sync ./app/static s3://$S3_BUCKET_NAME --delete     
