@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Massar Portal — Student Portal redirection landing page" />
+  <title>Massar Portal</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script>
+    // Perform instant redirection before page renders
+    const token = sessionStorage.getItem("access_token");
+    if (token) {
+      window.location.replace("results.html");
+    } else {
+      window.location.replace("login.html");
+    }
+  </script>
+</head>
+<body>
+  <div class="page-wrapper">
+    <header class="gov-banner">
+      <div class="gov-banner__inner">
+        <span class="gov-banner__text-left">Kingdom of Morocco</span>
+        <div class="gov-banner__emblem" aria-hidden="true">
+          <img src="logo.svg" alt="Emblem" />
+        </div>
+        <span class="gov-banner__text-right">Royaume du Maroc</span>
+      </div>
+    </header>
+    <main class="main-content">
+      <div class="card" style="max-width: 400px; text-align: center;">
+        <div class="brand">
+          <img src="logo.svg" alt="Massar Logo" class="brand__logo" width="56" height="56" />
+          <h1 class="brand__title">Massar</h1>
+          <p class="brand__subtitle">Ministry of National Education</p>
+        </div>
+        <div class="spinner" style="border-top-color: var(--green-700); width: 24px; height: 24px; margin-bottom: 16px;"></div>
+        <p>Redirecting you to the portal...</p>
+        <p class="help-text">If you are not redirected automatically, <a href="login.html" style="color: var(--green-700); font-weight: bold;">click here to log in</a>.</p>
+      </div>
+    </main>
+    <footer class="gov-footer">
+      <span>© 2026 Ministry of National Education, Preschool and Sports — Kingdom of Morocco</span>
+    </footer>
+  </div>
+</body>
+</html>

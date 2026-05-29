@@ -1,0 +1,22 @@
+{
+  "name": "massar-mock-app",
+  "version": "1.0.0",
+  "description": "Mock Moroccan Ministry of Education student portal (Massar) running on AWS ECS Fargate",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.577.0",
+    "@aws-sdk/client-secrets-manager": "^3.577.0",
+    "@aws-sdk/client-sqs": "^3.577.0",
+    "aws-jwt-verify": "^4.0.1",
+    "express": "^4.19.2",
+    "ioredis": "^5.4.1",
+    "mysql2": "^3.9.7"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "private": true
+}
