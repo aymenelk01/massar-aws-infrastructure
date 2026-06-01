@@ -44,9 +44,9 @@ resource "aws_lb_target_group" "target" {
 # create a listener for the alb to receive traffic from cdn on port 443 and forward it to the target group
 resource "aws_lb_listener" "frontend" {
   load_balancer_arn = aws_lb.alb.arn
-  port              = 443
-  protocol          = "HTTPS"
-  certificate_arn   = var.certificate_arn # uncomment this line and provide the ARN of the SSL certificate to enable HTTPS for the ALB
+  port              = 80
+  protocol          = "HTTP"
+  #certificate_arn   = var.certificate_arn  uncomment this line and provide the ARN of the SSL certificate to enable HTTPS for the ALB
 
 
   default_action {
@@ -56,6 +56,7 @@ resource "aws_lb_listener" "frontend" {
 
 }
 
+/* # uncomment this resource to create an HTTP listener that redirects traffic to HTTPS for better security, but make sure to provide the ARN of the SSL certificate in the variable and uncomment the certificate_arn line in the listener resource above
 resource "aws_lb_listener" "http_listener" {
   load_balancer_arn = aws_lb.alb.arn
   port              = 80
@@ -72,3 +73,4 @@ resource "aws_lb_listener" "http_listener" {
   }
 
 }
+*/

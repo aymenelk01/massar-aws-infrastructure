@@ -74,7 +74,7 @@ variable "sqs_queue_arn" {
 
 variable "db_secret_arn" {
   description = "The ARN of the database secret in Secrets Manager"
-  type = string
+  type        = string
 }
 
 # variable of the AWS region

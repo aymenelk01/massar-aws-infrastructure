@@ -14,6 +14,18 @@ permissions:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    env:
+      TF_VAR_environment: "dev"
+      TF_VAR_aws_region: "eu-south-1"
+      TF_VAR_db_name: "massardb"
+      TF_VAR_db_username: "aymenelk01" # Consider using a less identifiable username for security best practices
+      TF_VAR_db_password: ${{ secrets.DATABASE_PASSWORD }} # Sensitive: pull from GitHub Secrets
+      TF_VAR_documents_bucket_name: "app-massar-documents"
+      TF_VAR_static_bucket_name: "app-massar-static"
+      TF_VAR_state_bucket_name: "app-massar-state"
+      TF_VAR_logs_bucket_name: "app-massar-logs"
+      TF_VAR_cloudfront_prefix_list_id: "pl-1bbc5972" # Replace with your region's CloudFront prefix list ID
+
     defaults:
       run:
         working-directory: infra/
