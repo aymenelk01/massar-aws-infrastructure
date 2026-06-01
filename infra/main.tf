@@ -56,8 +56,8 @@ module "loadbalancer" {
   vpc_id            = module.vpc.vpc_id
   alb_sg_id         = module.security.alb_sg_id
   public_subnet_ids = module.vpc.public_subnet_ids
-  certificate_arn   = var.certificate_arn
-  logs_bucket_name  = var.logs_bucket_name
+  /* certificate_arn   = var.certificate_arn */ # uncomment this line and provide the ARN of the SSL certificate to enable HTTPS for the ALB
+  logs_bucket_name = var.logs_bucket_name
 }
 
 module "compute" {
