@@ -12,6 +12,15 @@ resource "aws_s3_bucket" "logs" {
         Name        = "${var.environment}-alb-logs-${var.logs_bucket_name}"
     }
 }
+
+# configure the bucket to store the logs from the state files bucket
+resource "aws_s3_bucket_logging" "logs_logging" {
+  bucket        = aws_s3_bucket.state_files.id
+  target_bucket = aws_s3_bucket.logs.id
+  target_prefix = "statelog/"
+}
+
+
 #2. encrypt the bucket using the default AWS S3 encryption
 resource "aws_s3_bucket_server_side_encryption_configuration" "logs_encryption" {
     bucket = aws_s3_bucket.logs.id

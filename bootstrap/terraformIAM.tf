@@ -19,7 +19,7 @@ resource "aws_iam_role" "terraform_role" {
           StringLike = {
             "token.actions.githubusercontent.com:sub" = "repo:${var.github_username}/${var.github_repo_name}:*" # Allow role assumption from GitHub Actions workflows triggered by tags, enabling deployment from tagged releases while maintaining security by restricting access to the specific repository
           }
-          
+
 
         }
       }

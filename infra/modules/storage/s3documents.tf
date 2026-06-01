@@ -46,11 +46,15 @@ resource "aws_s3_bucket_public_access_block" "documents_files_public_access" {
 
 resource "aws_s3_bucket_lifecycle_configuration" "documents_files_lifecycle" {
     bucket = aws_s3_bucket.documents_files.id
-
+    
     rule {
         id = "archive-old-documents"
         status = "Enabled"
     filter {} # apply the rule to all objects in the bucket
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
 
     # move the documents to standard_ia after 90 days
     transition {

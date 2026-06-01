@@ -1,8 +1,0 @@
-<svg viewBox="0 0 64 64" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-  <!-- Rounded container with Moroccan green color -->
-  <rect width="64" height="64" rx="16" fill="#007A33"/>
-  <!-- Central star (pentagram) in white -->
-  <polygon points="32,12 37.5,29 52,29 40.5,37.5 45,52 32,43 19,52 23.5,37.5 12,29 26.5,29" fill="#ffffff" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
-  <!-- Inner pentagram detail in green to make it look authentic -->
-  <polygon points="32,16 35.5,27 47,27 38,33 41,45 32,38 23,45 26,33 17,27 28.5,27" fill="#007A33" stroke="#007A33" stroke-width="1" stroke-linejoin="round"/>
-</svg>
