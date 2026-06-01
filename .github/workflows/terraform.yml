@@ -6,6 +6,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'infra/**'    
 
 permissions:
   contents: read
