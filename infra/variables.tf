@@ -12,8 +12,8 @@ variable "aws_region" {
 
 # variable of the database name
 variable "db_name" {
-    description = "The name of the database"
-    type = string
+  description = "The name of the database"
+  type        = string
 }
 
 # variable of the database username for the RDS instance
@@ -65,21 +65,21 @@ variable "certificate_arn" {
 }
 
 variable "oidc_terraform_role_name" {
-    description = "The name of the IAM role to create for GitHub Actions OIDC authentication"
-    type        = string
+  description = "The name of the IAM role to create for GitHub Actions OIDC authentication"
+  type        = string
 }
 
 variable "oidc_deploy_role_name" {
-    description = "The name of the IAM role to create for GitHub Actions OIDC authentication"
-    type        = string
+  description = "The name of the IAM role to create for GitHub Actions OIDC authentication"
+  type        = string
 }
 
 variable "github_repo_name" {
-    description = "The name of the GitHub repository (e.g., aymenelk01/massar-aws-infrastructure)"
-    type        = string
+  description = "The name of the GitHub repository (e.g., aymenelk01/massar-aws-infrastructure)"
+  type        = string
 }
 
 variable "github_username" {
-    description = "The GitHub username for the repository (e.g., aymenelk01)"
-    type        = string
+  description = "The GitHub username for the repository (e.g., aymenelk01)"
+  type        = string
 }
