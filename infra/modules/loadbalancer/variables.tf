@@ -28,7 +28,9 @@ variable "logs_bucket_name" {
     type = string
 }
 
+/* #uncomment this variable and provide the ARN of the SSL certificate to enable HTTPS for the ALB
 variable "certificate_arn" {
     description = "The ARN of the SSL certificate to create for the ALB"
     type = string
 }
+*/ 
