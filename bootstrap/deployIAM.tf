@@ -48,7 +48,7 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
           "s3:GetObject",
           "s3:DeleteObject"
         ]
-        Resource = "arn:aws:s3:::${var.static_bucket_name}/*"
+        Resource = "arn:aws:s3:::${var.environment}-${var.static_bucket_name}/*"
       },
       {
         Sid    = "S3StaticBucketList"
@@ -56,7 +56,7 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
         Action = [
           "s3:ListBucket"
         ]
-        Resource = "arn:aws:s3:::${var.static_bucket_name}"
+        Resource = "arn:aws:s3:::${var.environment}-${var.static_bucket_name}"
       },
 
       #ECR Authentication - must be * (account-level action, cannot be scoped to a single repo)
