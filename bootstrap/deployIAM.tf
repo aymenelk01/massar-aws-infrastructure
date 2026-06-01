@@ -16,7 +16,7 @@ resource "aws_iam_role" "deploy_role" {
         Condition = {
           StringEquals = {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-            "token.actions.githubusercontent.com:sub" = "repo:${var.github_username}/${var.github_repo_name}:ref:refs/heads/${var.github_branch_name}" # Restrict the role assumption to a specific GitHub repository and branch for enhanced security, ensuring that only workflows from the specified repository and branch can assume this role, which is a best practice for least privilege access control in AWS IAM when using OIDC with GitHub Actions
+            "token.actions.githubusercontent.com:sub" = "repo:${var.github_username}/${var.github_app_repo_name}:ref:refs/heads/${var.github_branch_name}" # Restrict the role assumption to a specific GitHub repository and branch for enhanced security, ensuring that only workflows from the specified repository and branch can assume this role, which is a best practice for least privilege access control in AWS IAM when using OIDC with GitHub Actions
           }
         }
       }
