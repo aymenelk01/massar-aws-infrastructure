@@ -4,10 +4,10 @@ resource "aws_security_group" "alb_sg" {
   description = "Security group for the Application Load Balancer"
   vpc_id      = var.vpc_id
 
-  # allow inbound traffic on port 443
+  # allow inbound traffic on port 80 from the CloudFront prefix list, which allows only CloudFront to access the ALB on port 80, enhancing security by restricting
   ingress {
-    from_port       = 443
-    to_port         = 443
+    from_port       = 80
+    to_port         = 80
     protocol        = "tcp"
     prefix_list_ids = [var.cloudfront_prefix_list_id] # AWS-managed prefix list for CloudFront
   }
