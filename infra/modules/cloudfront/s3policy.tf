@@ -11,7 +11,7 @@ resource "aws_s3_bucket_policy" "static_bucket_policy" {
           Service = "cloudfront.amazonaws.com"
         }
         Action   = "s3:GetObject"
-        Resource = "${var.environment}-${var.static_bucket_arn}/*"
+        Resource = "${var.static_bucket_arn}/*"
         Condition = {
           StringEquals = {
             "AWS:SourceArn" = aws_cloudfront_distribution.cdn.arn
