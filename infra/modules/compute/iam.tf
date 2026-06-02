@@ -55,7 +55,8 @@ resource "aws_iam_role" "ecs_task_role" {
 
 # create a custom policy for the ECS role to allow it to access the S3 bucket for the documents files
 resource "aws_iam_role_policy" "ecs_task_policy" {
-  # checkov:skip=CKV_AWS_355: ADD REASON
+  # checkov:skip=CKV_AWS_290: ssmmessages actions do not support resource-level restrictions
+  # checkov:skip=CKV_AWS_355: ssmmessages actions do not support resource-level restrictions
   name = "ecs-task-policy-${var.environment}"
   role = aws_iam_role.ecs_task_role.id
   policy = jsonencode({
