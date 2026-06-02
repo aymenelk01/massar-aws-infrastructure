@@ -29,30 +29,6 @@ resource "aws_iam_role_policy_attachment" "ecs_role_policy_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# create a custom policy for the ECS role to allow it to access the ssm messages for ECS Exec
-resource "aws_iam_role_policy" "ecs_exec_policy" {
-  name = "ecs-exec-policy-${var.environment}"
-  role = aws_iam_role.ecs_task_execution_role.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "ssmmessages:CreateControlChannel",
-          "ssmmessages:CreateDataChannel",
-          "ssmmessages:OpenControlChannel",
-          "ssmmessages:OpenDataChannel"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
-
-
-
-
 
 # ceate an IAM role for the ecs tasks 
 resource "aws_iam_role" "ecs_task_role" {
@@ -92,6 +68,17 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
           "s3:DeleteObject",
         ]
         Resource = "arn:aws:s3:::${var.documents_bucket_name}/*"
+      },
+
+      {
+        Effect = "Allow"
+        Action = [
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
+        ]
+        Resource = "*"
       },
 
       {
