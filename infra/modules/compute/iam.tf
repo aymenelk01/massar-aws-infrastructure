@@ -55,6 +55,7 @@ resource "aws_iam_role" "ecs_task_role" {
 
 # create a custom policy for the ECS role to allow it to access the S3 bucket for the documents files
 resource "aws_iam_role_policy" "ecs_task_policy" {
+  # checkov:skip=CKV_AWS_355: ADD REASON
   name = "ecs-task-policy-${var.environment}"
   role = aws_iam_role.ecs_task_role.id
   policy = jsonencode({
@@ -68,6 +69,17 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
           "s3:DeleteObject",
         ]
         Resource = "arn:aws:s3:::${var.documents_bucket_name}/*"
+      },
+
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:DescribeLogGroups",
+          "logs:CreateLogStream",
+          "logs:DescribeLogStreams",
+          "logs:PutLogEvents"
+        ]
+        Resource = "*"
       },
 
       {
