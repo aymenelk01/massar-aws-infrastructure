@@ -32,10 +32,11 @@ resource "aws_ecs_task_definition" "app" {
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
 
+
   container_definitions = jsonencode([
     {
       name      = "massar-app"
-      image = "${var.ecr_repository_url}:latest" # Use the latest tag for the container image, but consider using specific version tags for better control and stability in production environments
+      image     = "${var.ecr_repository_url}:latest" # Use the latest tag for the container image, but consider using specific version tags for better control and stability in production environments
       cpu       = 256
       memory    = 512
       essential = true
@@ -81,6 +82,9 @@ resource "aws_ecs_service" "service" {
   launch_type            = "FARGATE"
   enable_execute_command = true # Enable execute command for remote debugging and management of the tasks, which allows you to run commands in the container without needing to SSH into the underlying EC2 instances, providing a more secure and efficient way to troubleshoot and manage your application tasks
 
+  lifecycle {
+    ignore_changes = [task_definition] # Ignore changes to the task definition to prevent unnecessary service updates when the task definition is updated, allowing for smoother deployments and minimizing downtime during updates
+  }
 
   network_configuration {
     subnets          = var.private_app_subnet_ids
