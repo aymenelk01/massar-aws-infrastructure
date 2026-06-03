@@ -90,3 +90,19 @@ resource "aws_vpc_endpoint" "ssmmessages" {
         Environment = var.environment
 }
 }
+
+resource "aws_vpc_endpoint" "cognito" {
+    vpc_id = var.vpc_id
+    service_name = "com.amazonaws.${var.aws_region}.cognito-idp"
+    vpc_endpoint_type = "Interface"
+    private_dns_enabled = true
+    
+        subnet_ids = var.private_app_subnet_ids
+        security_group_ids = [var.vpc_endpoints_sg_id]
+
+    tags = {
+        Name = "CognitoInterfaceEndpoint-${var.environment}"
+        Environment = var.environment
+}
+}
+
