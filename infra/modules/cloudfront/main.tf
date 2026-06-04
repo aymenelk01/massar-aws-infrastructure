@@ -33,12 +33,7 @@ resource "aws_cloudfront_distribution" "cdn" {
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
 
-    forwarded_values {
-      query_string = false
-      cookies {
-        forward = "none"
-      }
-    }
+    cache_policy_id          = data.aws_cloudfront_cache_policy.optimized.id
   }
 
 
@@ -49,12 +44,8 @@ resource "aws_cloudfront_distribution" "cdn" {
     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods         = ["GET", "HEAD"]
 
-    forwarded_values {
-      query_string = true
-      cookies {
-        forward = "all"
-      }
-    }
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
+    cache_policy_id          = data.aws_cloudfront_cache_policy.disabled.id
   }
 
   # configure the restrictions for the distribution (e.g., geo-restrictions)
