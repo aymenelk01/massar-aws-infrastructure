@@ -61,6 +61,21 @@ jobs:
       - name: Terraform Init
         run: terraform init -input=false
 
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.50.0
+      
+      - name: Run TFLint
+        run: |
+          tflint --init
+          tflint -f compact  
+          
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: infra/
+          soft_fail: false    
 
       # Validate code integration without calling AWS APIs
       - name: Terraform Validate
