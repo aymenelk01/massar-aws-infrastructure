@@ -29,6 +29,7 @@ resource "aws_security_group" "ecs_sg" {
   name        = "ECS-SG-${var.environment}"
   description = "Security group for the ECS instances"
   vpc_id      = var.vpc_id
+  
 
   # allow traffic from the ALB security group on port 3000
   ingress {
