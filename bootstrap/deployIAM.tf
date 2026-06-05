@@ -120,6 +120,15 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
           "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ecsRole-${var.environment}",
           "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ecsTaskRole-${var.environment}"
         ]
+      },
+
+      {
+        Sid    = "cloudfrontInvalidation"
+        Effect = "Allow"
+        Action = [
+          "cloudfront:CreateInvalidation"
+        ]
+        Resource = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/*"
       }
     ]
   })
