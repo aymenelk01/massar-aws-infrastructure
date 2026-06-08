@@ -1,5 +1,6 @@
 # Create an ECS cluster to run the application tasks, enabling container insights for monitoring and troubleshooting purposes, and configuring execute command for remote debugging and management of the tasks
 resource "aws_ecs_cluster" "cluster" {
+  # checkov:skip=CKV_AWS_224: portfolio project; using AWS-managed default encryption for ECS cluster logs to avoid additional costs and complexity of managing custom KMS keys, while still ensuring that logs are encrypted at rest with AWS's default encryption
   name = "${var.environment}-cluster"
 
   setting {
