@@ -1,9 +1,29 @@
 
+# cerate CloudFront Function that rewrites requests to the root domain to the S3 static path.
+resource "aws_cloudfront_function" "rewrite_root" {
+  name    = "rewrite_root-${var.environment}"
+  runtime = "cloudfront-js-2.0"
+  comment = "CloudFront Function to rewrite requests to the root domain to the S3 static path exactly the index.html"
+  publish = true # publish the function to make it available for use in the distribution 
+  code    = file("${path.module}/functions/rewrite_root.js")
+}
+
+
 # create a CloudFront distribution
 resource "aws_cloudfront_distribution" "cdn" {
+  # checkov:skip=CKV2_AWS_47: Already attached to the WAF 
+  # checkov:skip=CKV2_AWS_32: Already attached to default cache behavior and ordered cache behavior, which are both configured to redirect HTTP to HTTPS, so this is effectively enforced for all requests
+  # checkov:skip=CKV_AWS_86: Passing via modern Standard Logging (v2) streaming directly to CloudWatch Logs instead of legacy S3 blocks
+  # checkov:skip=CKV2_AWS_42: Portfolio project exception; using the default CloudFront URL to minimize domain registration costs
+  # checkov:skip=CKV_AWS_174: Using default CloudFront certificate, no custom domain yet
+  # checkov:skip=CKV_AWS_310: This is a portfolio project; multi-region redundancy is disabled to optimize costs
+  # checkov:skip=CKV_AWS_374: CloudFront geo restriction — already documented: VPN bypass renders it ineffective
+  # checkov:skip=CKV_AWS_305: No default root object — default origin is ALB, not S3. Root redirect handled by CloudFront Function rewriting / to /static/index.html
   enabled             = true
   web_acl_id = aws_wafv2_web_acl.waf.arn
   comment             = "CloudFront distribution for static files-${var.environment}"
+  
+
 
   # configure the origin to point to the S3 bucket for static files
   origin {
@@ -32,7 +52,8 @@ resource "aws_cloudfront_distribution" "cdn" {
     viewer_protocol_policy = "redirect-to-https"
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
-
+    
+    response_headers_policy_id = data.aws_cloudfront_response_headers_policy.security_headers.id
     cache_policy_id          = data.aws_cloudfront_cache_policy.optimized.id
   }
 
@@ -44,8 +65,14 @@ resource "aws_cloudfront_distribution" "cdn" {
     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods         = ["GET", "HEAD"]
 
+    response_headers_policy_id = data.aws_cloudfront_response_headers_policy.security_headers.id
     origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
     cache_policy_id          = data.aws_cloudfront_cache_policy.disabled.id
+
+    function_association {
+      event_type   = "viewer-request" # it will execute the function at the viewer request event, which is the earliest point in the request processing lifecycle, allowing you to modify the request before it is processed by CloudFront.
+      function_arn = aws_cloudfront_function.rewrite_root.arn
+    }
   }
 
   # configure the restrictions for the distribution (e.g., geo-restrictions)
@@ -67,3 +94,5 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
 }
+
+
