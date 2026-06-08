@@ -1,19 +1,18 @@
+# ------------------------------------------
+# VPC Endpoints Outputs
+# ------------------------------------------
 
-
-output "ecr_api_endpoint_id" {
-    description = "The ID of the VPC endpoint for ECR API"
-    value = aws_vpc_endpoint.ecr_api.id
-  
+output "vpc_endpoint_ids" {
+  description = "A map of service names to their corresponding VPC Endpoint IDs."
+  value       = { for service, endpoint in aws_vpc_endpoint.interfaces : service => endpoint.id }
 }
 
-output "ecr_dkr_endpoint_id" {
-    description = "The ID of the VPC endpoint for ECR DKR"
-    value = aws_vpc_endpoint.ecr_dkr.id
-  
+output "vpc_endpoint_arns" {
+  description = "A map of service names to their corresponding VPC Endpoint ARNs."
+  value       = { for service, endpoint in aws_vpc_endpoint.interfaces : service => endpoint.arn }
 }
 
-output "logs_endpoint_id" {
-    description = "The ID of the VPC endpoint for Logs"
-    value = aws_vpc_endpoint.logs.id
-  
+output "vpc_endpoint_dns_entries" {
+  description = "A map of service names to their corresponding DNS entries."
+  value       = { for service, endpoint in aws_vpc_endpoint.interfaces : service => endpoint.dns_entry }
 }
