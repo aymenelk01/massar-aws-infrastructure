@@ -28,6 +28,7 @@ resource "aws_rds_cluster" "aurora" {
   enabled_cloudwatch_logs_exports = ["audit", "error", "slowquery"]
   deletion_protection             = false
   copy_tags_to_snapshot           = false
+
   depends_on = [
     aws_cloudwatch_log_group.aurora_error_logs,
     aws_cloudwatch_log_group.aurora_slowquery_logs
@@ -47,11 +48,14 @@ resource "aws_rds_cluster" "aurora" {
 
 # Create a RDS instance for the Aurora cluster, using the serverless v2 configuration for on-demand scaling based on workload demands
 resource "aws_rds_cluster_instance" "aurora_instance" {
-  cluster_identifier = aws_rds_cluster.aurora.cluster_identifier
-  identifier         = "aurora-instance-${var.environment}"
-  instance_class     = "db.serverless"
-  engine             = aws_rds_cluster.aurora.engine
-  engine_version     = aws_rds_cluster.aurora.engine_version
+  # checkov:skip=CKV_AWS_118: Portfolio project- Enhanced monitoring is disabled to insulate the portfolio project from operational metrics fees.
+  # checkov:skip=CKV_AWS_353: Portfolio project- Performance insights are bypassed to avoid additional costs, which is acceptable for a portfolio project.
+  cluster_identifier         = aws_rds_cluster.aurora.cluster_identifier
+  identifier                 = "aurora-instance-${var.environment}"
+  instance_class             = "db.serverless"
+  engine                     = aws_rds_cluster.aurora.engine
+  engine_version             = aws_rds_cluster.aurora.engine_version
+  auto_minor_version_upgrade = true # Enable automatic minor version upgrades to ensure the database instance receives important security patches and updates without manual intervention, which is suitable for a portfolio project and helps maintain security without additional operational overhead.
 
   tags = {
     Name        = "AuroraInstance-${var.environment}"
