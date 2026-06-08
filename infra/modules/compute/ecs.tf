@@ -32,6 +32,7 @@ resource "aws_ecs_task_definition" "app" {
   memory                   = "512"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
+  
 
 
   container_definitions = jsonencode([
@@ -41,6 +42,7 @@ resource "aws_ecs_task_definition" "app" {
       cpu       = 256
       memory    = 512
       essential = true
+      readonlyRootFilesystem = true # Set the root filesystem to read-only for improved security, which prevents the application from making changes to the underlying filesystem and helps mitigate potential attack vectors that rely on writing to the filesystem
 
       portMappings = [
         {
