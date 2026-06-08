@@ -16,3 +16,7 @@ variable "cloudfront_prefix_list_id" {
     type = string
 }
 
+variable "vpc_cidr_block" {
+    description = "The CIDR block of the VPC"
+    type = string
+}
