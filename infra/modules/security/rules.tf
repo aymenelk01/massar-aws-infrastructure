@@ -2,6 +2,8 @@
 # ALB Rule Definitions
 # ------------------------------------------
 resource "aws_vpc_security_group_ingress_rule" "alb_from_cloudfront" {
+  # checkov:skip=CKV_AWS_260:False Positive. Source traffic is restricted exclusively to CloudFront IPs via prefix lists, not 0.0.0.0/0.
+
   security_group_id = aws_security_group.alb_sg.id
   description       = "Allow inbound HTTP traffic strictly from CloudFront edge locations"
   from_port         = 80
@@ -16,7 +18,7 @@ resource "aws_vpc_security_group_egress_rule" "alb_to_ecs" {
   from_port                    = 3000
   to_port                      = 3000
   ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.ecs_sg.id 
+  referenced_security_group_id = aws_security_group.ecs_sg.id
 }
 
 # ------------------------------------------
@@ -38,7 +40,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_to_vpc_dns_udp" {
   from_port         = 53
   to_port           = 53
   ip_protocol       = "udp"
-  cidr_ipv4        = var.vpc_cidr_block # allow traffic to the entire VPC CIDR, which includes the AmazonProvidedDNS IP address (the .2 address in the VPC CIDR) and ensures that the ECS tasks can resolve domain names for external communication and service discovery within the VPC
+  cidr_ipv4         = var.vpc_cidr_block # allow traffic to the entire VPC CIDR, which includes the AmazonProvidedDNS IP address (the .2 address in the VPC CIDR) and ensures that the ECS tasks can resolve domain names for external communication and service discovery within the VPC
 }
 
 resource "aws_vpc_security_group_egress_rule" "ecs_to_vpc_dns_tcp" {
@@ -46,8 +48,8 @@ resource "aws_vpc_security_group_egress_rule" "ecs_to_vpc_dns_tcp" {
   description       = "Allow outbound TCP DNS queries to the VPC AmazonProvidedDNS"
   from_port         = 53
   to_port           = 53
-  ip_protocol       = "tcp" 
-  cidr_ipv4        = var.vpc_cidr_block # allow traffic to the entire VPC CIDR, which includes the AmazonProvidedDNS IP address (the .2 address in the VPC CIDR) and ensures that the ECS tasks can resolve domain names for external communication and service discovery within the VPC
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.vpc_cidr_block # allow traffic to the entire VPC CIDR, which includes the AmazonProvidedDNS IP address (the .2 address in the VPC CIDR) and ensures that the ECS tasks can resolve domain names for external communication and service discovery within the VPC
 }
 
 
