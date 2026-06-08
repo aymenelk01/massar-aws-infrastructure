@@ -1,6 +1,9 @@
 ###1. create a bucket for the documents files
 # create the bucket
 resource "aws_s3_bucket" "documents_files" {
+  #checkov:skip=CKV_AWS_144:Cross-region replication not required — portfolio project, no DR requirements
+  #checkov:skip=CKV2_AWS_62:S3 event notifications not required — no application logic depends on reacting to S3 object events
+  #checkov:skip=CKV_AWS_145: Portfolio project- AWS default encryption is sufficient for a portfolio project, so using the default AWS-managed encryption to avoid additional costs from a custom KMS key.
   bucket = "${var.environment}-${var.documents_bucket_name}"
 
 
@@ -45,11 +48,11 @@ resource "aws_s3_bucket_public_access_block" "documents_files_public_access" {
 
 
 resource "aws_s3_bucket_lifecycle_configuration" "documents_files_lifecycle" {
-    bucket = aws_s3_bucket.documents_files.id
-    
-    rule {
-        id = "archive-old-documents"
-        status = "Enabled"
+  bucket = aws_s3_bucket.documents_files.id
+
+  rule {
+    id     = "archive-old-documents"
+    status = "Enabled"
     filter {} # apply the rule to all objects in the bucket
 
     abort_incomplete_multipart_upload {
@@ -58,14 +61,20 @@ resource "aws_s3_bucket_lifecycle_configuration" "documents_files_lifecycle" {
 
     # move the documents to standard_ia after 90 days
     transition {
-        days          = 90
-        storage_class = "STANDARD_IA"
+      days          = 90
+      storage_class = "STANDARD_IA"
     }
 
     # move the documents to glacier after 365 days
     transition {
-        days          = 365
-        storage_class = "GLACIER"
+      days          = 365
+      storage_class = "GLACIER"
     }
-    }
+  }
+}
+
+resource "aws_s3_bucket_logging" "documents_files" {
+  bucket        = aws_s3_bucket.documents_files.id
+  target_bucket = aws_s3_bucket.logs.id
+  target_prefix = "documentsbucketlog/"
 }
