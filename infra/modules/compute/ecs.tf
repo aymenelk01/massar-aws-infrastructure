@@ -61,14 +61,14 @@ resource "aws_ecs_task_definition" "app" {
         { name = "SQS_QUEUE_URL", value = var.sqs_queue_url },
         { name = "DB_SECRET_ARN", value = var.db_secret_arn },
         { name = "ENVIRONMENT", value = var.environment },
-        { name = "AWS_REGION", value = var.aws_region }
+        { name = "AWS_REGION", value = data.aws_region.current.region }
       ]
 
       logConfiguration = {
         logDriver = "awslogs"
         options = {
           awslogs-group         = aws_cloudwatch_log_group.ecs_log_group.name
-          awslogs-region        = var.aws_region
+          awslogs-region        = data.aws_region.current.region
           awslogs-stream-prefix = "ecs"
         }
       }
