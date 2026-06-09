@@ -1,13 +1,4 @@
 
-# cerate CloudFront Function that rewrites requests to the root domain to the S3 static path.
-resource "aws_cloudfront_function" "rewrite_root" {
-  name    = "rewrite_root-${var.environment}"
-  runtime = "cloudfront-js-2.0"
-  comment = "CloudFront Function to rewrite requests to the root domain to the S3 static path exactly the index.html"
-  publish = true # publish the function to make it available for use in the distribution 
-  code    = file("${path.module}/functions/rewrite_root.js")
-}
-
 
 # create a CloudFront distribution
 resource "aws_cloudfront_distribution" "cdn" {
@@ -19,10 +10,11 @@ resource "aws_cloudfront_distribution" "cdn" {
   # checkov:skip=CKV_AWS_310: This is a portfolio project; multi-region redundancy is disabled to optimize costs
   # checkov:skip=CKV_AWS_374: CloudFront geo restriction — already documented: VPN bypass renders it ineffective
   # checkov:skip=CKV_AWS_305: No default root object — default origin is ALB, not S3. Root redirect handled by CloudFront Function rewriting / to /static/index.html
-  enabled             = true
+  enabled    = true
   web_acl_id = aws_wafv2_web_acl.waf.arn
-  comment             = "CloudFront distribution for static files-${var.environment}"
-  
+  comment    = "CloudFront distribution for static files-${var.environment}"
+  default_root_object = "index.html" 
+
 
 
   # configure the origin to point to the S3 bucket for static files
@@ -30,6 +22,7 @@ resource "aws_cloudfront_distribution" "cdn" {
     domain_name              = var.static_bucket_regional_domain_name
     origin_id                = "S3staticOrigins"
     origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
+    origin_path              = "/static" # this will ensure that requests to the root domain (e.g., /) will be forwarded to the /static path in the S3 bucket, allowing CloudFront to serve the index.html file for the root domain requests.
   }
 
   # configure the origin to point to the ALB for dynamic content
@@ -46,33 +39,29 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   # configure the default cache behavior to forward requests to the static bucket for static content
-  ordered_cache_behavior {
-    path_pattern           = "/static/*"
+  default_cache_behavior {
     target_origin_id       = "S3staticOrigins"
     viewer_protocol_policy = "redirect-to-https"
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
-    
+
     response_headers_policy_id = data.aws_cloudfront_response_headers_policy.security_headers.id
-    cache_policy_id          = data.aws_cloudfront_cache_policy.optimized.id
+    cache_policy_id            = data.aws_cloudfront_cache_policy.optimized.id
   }
 
 
   # configure a cache behavior to forward requests to the ALB for dynamic content
-  default_cache_behavior {
+  ordered_cache_behavior {
+    path_pattern = "/api/*" # this will forward all requests that start with /api/ to the ALB, allowing it to handle the dynamic content requests. You can adjust this path pattern based on your application's routing structure and requirements.
     target_origin_id       = "ALBorigins"
     viewer_protocol_policy = "redirect-to-https"
     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods         = ["GET", "HEAD"]
 
     response_headers_policy_id = data.aws_cloudfront_response_headers_policy.security_headers.id
-    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
-    cache_policy_id          = data.aws_cloudfront_cache_policy.disabled.id
+    origin_request_policy_id   = data.aws_cloudfront_origin_request_policy.all_viewer.id
+    cache_policy_id            = data.aws_cloudfront_cache_policy.disabled.id
 
-    function_association {
-      event_type   = "viewer-request" # it will execute the function at the viewer request event, which is the earliest point in the request processing lifecycle, allowing you to modify the request before it is processed by CloudFront.
-      function_arn = aws_cloudfront_function.rewrite_root.arn
-    }
   }
 
   # configure the restrictions for the distribution (e.g., geo-restrictions)
