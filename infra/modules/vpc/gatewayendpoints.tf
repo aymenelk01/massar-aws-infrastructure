@@ -1,7 +1,7 @@
 # create an vpc endpoint for s3
 resource "aws_vpc_endpoint" "s3_gateway" {
     vpc_id = aws_vpc.main.id
-    service_name = "com.amazonaws.${var.aws_region}.s3"
+    service_name = "com.amazonaws.${data.aws_region.current.region}.s3"
     vpc_endpoint_type = "Gateway"
     
     # associate the endpoint with all route tables in the VPC
