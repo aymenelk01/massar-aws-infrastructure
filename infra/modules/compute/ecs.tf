@@ -25,6 +25,7 @@ resource "aws_ecs_cluster" "cluster" {
 
 # Create an ecs task definition for the application, specifying the container image, resource requirements, environment variables, and log configurationuration to send logs to CloudWatch Logs for monitoring and troubleshooting purposes
 resource "aws_ecs_task_definition" "app" {
+  # checkov:skip=CKV_AWS_336: Writable root filesystem is required for AWS ECS Exec (SSM Agent) to run.
   family                   = "${var.environment}-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
@@ -32,17 +33,17 @@ resource "aws_ecs_task_definition" "app" {
   memory                   = "512"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
-  
+
 
 
   container_definitions = jsonencode([
     {
-      name      = "massar-app"
-      image     = "${var.ecr_repository_url}:latest" # Use the latest tag for the container image, but consider using specific version tags for better control and stability in production environments
-      cpu       = 256
-      memory    = 512
-      essential = true
-      readonlyRootFilesystem = true # Set the root filesystem to read-only for improved security, which prevents the application from making changes to the underlying filesystem and helps mitigate potential attack vectors that rely on writing to the filesystem
+      name                   = "massar-app"
+      image                  = "${var.ecr_repository_url}:latest" # Use the latest tag for the container image, but consider using specific version tags for better control and stability in production environments
+      cpu                    = 256
+      memory                 = 512
+      essential              = true
+      readonlyRootFilesystem = false # set to false to not block ecs exec command, which requires write access to the filesystem for the SSM agent to function properly. In a production environment, you should set this to true and use a sidecar container for the SSM agent to ensure better security by isolating the SSM agent from the application container and minimizing the attack surface of the application container. This is a portfolio project, so we are prioritizing simplicity and ease of use over strict security best practices, but in a production environment, you should follow security best practices and consider using a sidecar container for the SSM agent if you want to enable execute command with a read-only root filesystem for better security.
 
       portMappings = [
         {
