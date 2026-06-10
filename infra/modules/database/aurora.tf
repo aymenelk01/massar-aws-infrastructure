@@ -28,6 +28,7 @@ resource "aws_rds_cluster" "aurora" {
   enabled_cloudwatch_logs_exports = ["audit", "error", "slowquery"]
   deletion_protection             = false
   copy_tags_to_snapshot           = false
+  skip_final_snapshot = true # Skip final snapshot to avoid additional costs in a portfolio project, as the database is not critical and can be easily recreated if needed. This is acceptable for a non-production environment where data persistence is not a concern.
 
   depends_on = [
     aws_cloudwatch_log_group.aurora_error_logs,
