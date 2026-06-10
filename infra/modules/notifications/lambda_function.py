@@ -22,9 +22,16 @@ def lambda_handler(event, context):
         email  = body["email"]
         phone  = body["phone"]
         result = body["result"]
+        full_name = body.get("full_name", "Étudiant")
+        subjects = body.get("subjects", [])
         
+        # format subjects & marks
+        marks_summary = ""
+        if subjects:
+            marks_summary = "\n\nNotes obtenues :\n" + "\n".join([f"- {s['subject_name']} : {s['grade']}/20" for s in subjects])
+            
         # build the notification message
-        message = f"Résultats Bac 2026: Votre résultat est: {result}. Connectez-vous sur massar.ma pour les détails."
+        message = f"Résultats Bac 2026 pour {full_name} :\nRésultat : {result}{marks_summary}\n\nConnectez-vous sur massar.ma pour plus de détails."
         
         # publish to SNS — SNS delivers to SMS and email simultaneously
         sns.publish(

@@ -1,5 +1,6 @@
 # Create an ECS cluster to run the application tasks, enabling container insights for monitoring and troubleshooting purposes, and configuring execute command for remote debugging and management of the tasks
 resource "aws_ecs_cluster" "cluster" {
+  # checkov:skip=CKV_AWS_224: portfolio project; using AWS-managed default encryption for ECS cluster logs to avoid additional costs and complexity of managing custom KMS keys, while still ensuring that logs are encrypted at rest with AWS's default encryption
   name = "${var.environment}-cluster"
 
   setting {
@@ -31,6 +32,7 @@ resource "aws_ecs_task_definition" "app" {
   memory                   = "512"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
+  
 
 
   container_definitions = jsonencode([
@@ -40,6 +42,7 @@ resource "aws_ecs_task_definition" "app" {
       cpu       = 256
       memory    = 512
       essential = true
+      readonlyRootFilesystem = true # Set the root filesystem to read-only for improved security, which prevents the application from making changes to the underlying filesystem and helps mitigate potential attack vectors that rely on writing to the filesystem
 
       portMappings = [
         {
@@ -58,14 +61,14 @@ resource "aws_ecs_task_definition" "app" {
         { name = "SQS_QUEUE_URL", value = var.sqs_queue_url },
         { name = "DB_SECRET_ARN", value = var.db_secret_arn },
         { name = "ENVIRONMENT", value = var.environment },
-        { name = "AWS_REGION", value = var.aws_region }
+        { name = "AWS_REGION", value = data.aws_region.current.region }
       ]
 
       logConfiguration = {
         logDriver = "awslogs"
         options = {
           awslogs-group         = aws_cloudwatch_log_group.ecs_log_group.name
-          awslogs-region        = var.aws_region
+          awslogs-region        = data.aws_region.current.region
           awslogs-stream-prefix = "ecs"
         }
       }

@@ -1,4 +1,6 @@
 resource "aws_ecr_repository" "massar_repo" {
+  # checkov:skip=CKV_AWS_136: Portfolio project- AWS default encryption is sufficient for a portfolio project, so using the default AWS-managed encryption to avoid additional costs from a custom KMS key.
+  # checkov:skip=CKV_AWS_51: Tag immutability disabled by design — pipeline pushes both SHA and latest tags. Latest tag required for ECS bootstrap; SHA tags provide rollback capability
   name                 = "ecr-repository-${var.environment}"
   image_tag_mutability = "MUTABLE"
 
@@ -14,4 +16,42 @@ resource "aws_ecr_repository" "massar_repo" {
     Name        = "ECRRepository-${var.environment}"
     Environment = var.environment
   }
+}
+
+# create a lifecycle policy for the ECR repository to automatically clean up old images and manage storage costs, while keeping recent images for rollback safety
+resource "aws_ecr_lifecycle_policy" "cleanup_policy" {
+  repository = aws_ecr_repository.massar_repo.name
+
+  policy = <<EOF
+{
+    "rules": [
+        {
+            "rulePriority": 1,
+            "description": "Keep only the last 5 images tagged with a Git SHA for rollback safety",
+            "selection": {
+                "tagStatus": "tagged",
+                "tagPatternList": ["sha-*"], 
+                "countType": "imageCountMoreThan",
+                "countNumber": 5
+            },
+            "action": {
+                "type": "expire"
+            }
+        },
+        {
+            "rulePriority": 2,
+            "description": "Immediately delete orphaned untagged images to save storage costs",
+            "selection": {
+                "tagStatus": "untagged",
+                "countType": "sinceImagePushed",
+                "countUnit": "days",
+                "countNumber": 1
+            },
+            "action": {
+                "type": "expire"
+            }
+        }
+    ]
+}
+EOF
 }

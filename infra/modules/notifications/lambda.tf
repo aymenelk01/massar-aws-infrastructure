@@ -10,6 +10,11 @@ data "archive_file" "lambda_zip" {
 
 # create the AWS Lambda function resource. The function_name is set based on the environment variable, and the role is assigned from the IAM role created in the iam.tf file. The handler specifies the entry point for the Lambda function, and the runtime is set to Python 3.12. The timeout and memory_size are configurable through variables. The source_code_hash ensures that the Lambda function is updated whenever the code changes.
 resource "aws_lambda_function" "notifications_lambda" {
+  # checkov:skip=CKV_AWS_272:AWS Signer overhead is unnecessary for an isolated portfolio pipeline.
+  # checkov:skip=CKV_AWS_115:Portfolio project with low traffic; unreserved concurrency is perfectly fine.
+  # checkov:skip=CKV_AWS_116:DLQ is handled at the SQS trigger level, not the function level.
+  # checkov:skip=CKV_AWS_117:Lambda does not access VPC resources — placing it inside VPC adds cold start latency with no security benefit
+  # checkov:skip=CKV_AWS_173:Default AWS KMS encryption is sufficient for this portfolio project.
   function_name    = "${var.environment}-notifications-lambda"
   role             = aws_iam_role.lambda_role.arn
   handler          = "lambda_function.lambda_handler"
@@ -20,6 +25,10 @@ resource "aws_lambda_function" "notifications_lambda" {
   depends_on       = [aws_cloudwatch_log_group.lambda_log_group]
 
   filename = data.archive_file.lambda_zip.output_path
+
+  tracing_config {
+    mode = "Active"
+  }
 
   environment {
     variables = {

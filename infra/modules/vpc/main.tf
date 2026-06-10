@@ -26,7 +26,8 @@ resource "aws_subnet" "public" {
     vpc_id = aws_vpc.main.id
     cidr_block = var.public_subnet_cidrs[count.index]
     availability_zone = var.availability_zones[count.index]
-    map_public_ip_on_launch = true
+    map_public_ip_on_launch = false # disable auto-assign public IPs to enhance security because there is just alb who lives in the public subnet and he manages its own IP addresses 
+
 
     tags = {
         Name = "PublicSubnet-${var.environment}-${count.index + 1}"
@@ -113,4 +114,13 @@ resource "aws_route_table_association" "private_db" {
     count = length(var.private_db_subnet_cidrs)
     subnet_id = aws_subnet.private_db[count.index].id
     route_table_id = aws_route_table.db_RT[count.index].id
+}
+
+
+# Explicitly restrict the default security group to deny all traffic.
+# This prevents any resource from accidentally inheriting permissive default rules.
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.main.id
+
+  # No ingress or egress rules — all traffic denied by default
 }

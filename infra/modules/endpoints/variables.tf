@@ -30,3 +30,20 @@ variable "aws_region" {
   description = "The AWS region"
   type        = string
 }
+
+
+variable "vpc_endpoint_services" {
+  type        = set(string)
+  description = "Set of AWS service suffixes requiring VPC Interface Endpoints."
+  default = [
+    "ecr.api",
+    "ecr.dkr",
+    "logs",
+    "ssm",
+    "ec2messages",
+    "ssmmessages",
+    "cognito-idp",
+    "secretsmanager",
+    "sqs"
+  ]
+}

@@ -9,11 +9,13 @@ resource "aws_elasticache_subnet_group" "cache_subnet_group" {
     Environment = var.environment
   }
 }
-
+ 
 # Create an ElastiCache replication group for Redis, using the custom parameter group and subnet group defined above
 resource "aws_elasticache_replication_group" "cache_replication_group" {
-  automatic_failover_enabled  = true
-  preferred_cache_cluster_azs = ["eu-south-1a", "eu-south-1b"] # specify the availability zones for the cache clusters to improve availability and fault tolerance
+  #checkov:skip=CKV_AWS_31:auth_token not required — Redis 7 supports RBAC via user groups. auth_token is the legacy authentication mechanism. ElastiCache user group authentication is documented as a future improvement
+  #checkov:skip=CKV_AWS_191:AWS managed key acceptable for portfolio project — CMK is a future improvement
+  automatic_failover_enabled  = true # enable automatic failover to improve availability by allowing the replication group to automatically promote a read replica to primary if the primary node fails
+  preferred_cache_cluster_azs = var.availability_zones # specify the availability zones for the cache clusters to improve availability and fault tolerance
   replication_group_id        = "massar-cache-${var.environment}"
   description                 = "Massar Cache Replication Group for ${var.environment} environment"
   node_type                   = "cache.t3.micro" # choose an appropriate node type based on your requirements 
@@ -23,6 +25,9 @@ resource "aws_elasticache_replication_group" "cache_replication_group" {
   security_group_ids          = [var.elasticache_sg_id]
   port                        = 6379
 
+  transit_encryption_enabled   = true # enable in-transit encryption to secure data in transit between the cache clusters and the clients
+  at_rest_encryption_enabled   = true # enable at-rest encryption to secure data stored in the cache clusters
+  
   tags = {
     Name        = "MassarCache-${var.environment}"
     Environment = var.environment

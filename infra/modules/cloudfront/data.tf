@@ -10,3 +10,9 @@ data "aws_cloudfront_cache_policy" "optimized" {
 data "aws_cloudfront_origin_request_policy" "all_viewer" {
   name = "Managed-AllViewerExceptHostHeader"
 }
+
+# Fetch the pre-configured AWS Managed Security Headers policy
+data "aws_cloudfront_response_headers_policy" "security_headers" {
+  name = "Managed-SecurityHeadersPolicy"
+}
+

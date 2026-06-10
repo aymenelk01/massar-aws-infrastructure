@@ -1,4 +1,5 @@
 resource "aws_wafv2_web_acl" "waf" {
+  # checkov:skip=CKV2_AWS_31: WAF logging deferred — documented as future improvement
   provider    = aws.us_east_1 # WAF must be created in us-east-1 for CloudFront distributions
   name        = "massar-waf-${var.environment}"
   description = "WAF for Massar application - ${var.environment} environment"
@@ -18,7 +19,7 @@ resource "aws_wafv2_web_acl" "waf" {
 
     statement {
       rate_based_statement {
-        limit              = 10
+        limit              = 100
         aggregate_key_type = "IP"
         scope_down_statement {
           byte_match_statement {
@@ -54,7 +55,7 @@ resource "aws_wafv2_web_acl" "waf" {
 
     statement {
       rate_based_statement {
-        limit              = 500
+        limit              = 1500
         aggregate_key_type = "IP"
       }
     }
@@ -128,6 +129,28 @@ rule {
     visibility_config {
     cloudwatch_metrics_enabled = true
     metric_name                = "SQLiRuleSet"
+    sampled_requests_enabled   = true
+  }
+}
+
+rule {
+  name = "AWSManagedRulesKnownBadInputsRuleSet"
+  priority = 6
+
+    override_action {
+        none {}
+    }
+
+    statement {
+        managed_rule_group_statement {
+            name = "AWSManagedRulesKnownBadInputsRuleSet"
+            vendor_name = "AWS"
+        }
+    }
+
+    visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "knownBadInputsRuleSet"
     sampled_requests_enabled   = true
   }
 }

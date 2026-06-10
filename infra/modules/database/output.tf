@@ -17,3 +17,8 @@ output "db_name" {
   description = "the name of the database"
   value       = aws_rds_cluster.aurora.database_name
 }
+
+output "secretmanager_arn" {
+  description = "the ARN of the secret manager"
+  value       = aws_secretsmanager_secret.credential_secret.arn
+}
