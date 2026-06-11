@@ -122,13 +122,14 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
         ]
       },
 
+       # SSM Parameter Store Read Access - scoped to the specific parameters for the application
       {
-        Sid    = "cloudfrontInvalidation"
+        Sid    = "SSMReadCognitoParameters"
         Effect = "Allow"
-        Action = [
-          "cloudfront:CreateInvalidation"
+        Action = ["ssm:GetParameter"]
+        Resource = ["arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/massar/${var.environment}/cognito_user_pool_id",
+          "arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/massar/${var.environment}/cognito_client_id"
         ]
-        Resource = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/*"
       }
     ]
   })

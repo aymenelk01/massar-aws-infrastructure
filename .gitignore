@@ -33,3 +33,6 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Ignore package-lock.json if using npm, as it can cause issues with Terraform's dependency management
+package-lock.json
