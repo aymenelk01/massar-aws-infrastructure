@@ -47,6 +47,11 @@ variable "ecr_repository_url" {
   type        = string
 }
 
+variable "ecr_flyway_repository_url" {
+  description = "The URL of the ECR repository for Flyway"
+  type        = string
+}
+
 variable "ecs_sg_id" {
   description = "The ID of the security group for the ECS tasks"
   type        = string

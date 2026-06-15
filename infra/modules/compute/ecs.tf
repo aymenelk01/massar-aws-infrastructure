@@ -25,7 +25,6 @@ resource "aws_ecs_cluster" "cluster" {
 
 # Create an ecs task definition for the application, specifying the container image, resource requirements, environment variables, and log configurationuration to send logs to CloudWatch Logs for monitoring and troubleshooting purposes
 resource "aws_ecs_task_definition" "app" {
-  # checkov:skip=CKV_AWS_336: Writable root filesystem is required for AWS ECS Exec (SSM Agent) to run.
   family                   = "${var.environment}-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
@@ -33,17 +32,48 @@ resource "aws_ecs_task_definition" "app" {
   memory                   = "512"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
-
-
+  
 
   container_definitions = jsonencode([
     {
       name                   = "massar-app"
       image                  = "${var.ecr_repository_url}:latest" # Use the latest tag for the container image, but consider using specific version tags for better control and stability in production environments
-      cpu                    = 256
-      memory                 = 512
       essential              = true
-      readonlyRootFilesystem = false # set to false to not block ecs exec command, which requires write access to the filesystem for the SSM agent to function properly. In a production environment, you should set this to true and use a sidecar container for the SSM agent to ensure better security by isolating the SSM agent from the application container and minimizing the attack surface of the application container. This is a portfolio project, so we are prioritizing simplicity and ease of use over strict security best practices, but in a production environment, you should follow security best practices and consider using a sidecar container for the SSM agent if you want to enable execute command with a read-only root filesystem for better security.
+      readonlyRootFilesystem = true # Set to true to enhance security by preventing write access to the root filesystem, which is a best practice for container security, but ensure that any necessary writable directories are defined as volumes and mounted properly for the application to function correctly
+
+      # Define mount points for the SSM agent to allow it to function properly within the container, enabling features like ECS Exec for remote debugging and management of the tasks, which requires access to specific directories for storing agent data and logs, and ensuring that these directories are writable by the SSM agent for proper operation
+      mountPoints = [
+        {
+          sourceVolume  = "ssm-lib"
+          containerPath = "/var/lib/amazon/ssm"
+          readOnly      = false # Set to false to allow the SSM agent to write necessary data to this directory for its operation, which is required for features like ECS Exec to function properly, but ensure that proper security measures are in place to protect this volume and its contents from unauthorized access or modifications
+        },
+        {
+          sourceVolume  = "ssm-log"
+          containerPath = "/var/log/amazon/ssm"
+          readOnly      = false
+        },
+        {
+          sourceVolume  = "managed-agents"
+          containerPath = "/managed-agents"
+          readOnly      = false
+        }
+      ]
+
+      # Define volumes for the SSM agent to provide necessary storage for its operation
+      volume = {
+        name = "ssm-lib"
+      }
+
+      volume = {
+        name = "ssm-log"
+      }
+
+      volume = {
+        name = "managed-agents"
+      }
+
+
 
       portMappings = [
         {

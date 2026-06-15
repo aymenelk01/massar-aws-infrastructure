@@ -23,6 +23,26 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   }
 }
 
+# Custom policy to allow the ECS Agent to fetch and decrypt the db credentials at boot
+resource "aws_iam_role_policy" "ecs_execution_secrets_policy" {
+  name = "ecs-execution-secrets-policy-${var.environment}"
+  role = aws_iam_role.ecs_task_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ]
+        Resource = [var.db_secret_arn]
+      }
+    ]
+  })
+}
+
+
 # attach the AmazonECSTaskExecutionRolePolicy managed policy to the ECS role
 resource "aws_iam_role_policy_attachment" "ecs_role_policy_attachment" {
   role       = aws_iam_role.ecs_task_execution_role.name
@@ -53,7 +73,7 @@ resource "aws_iam_role" "ecs_task_role" {
   }
 }
 
-# create a custom policy for the ECS role to allow it to access the S3 bucket for the documents files
+# create a custom policy for the ECS role to allow it to access the S3 bucket for the documents files and to send logs to CloudWatch Logs, and to allow it to use SSM for ECS Exec, and to allow it to send messages to the SQS queue, and to allow it to access the database credentials stored in Secrets Manager
 resource "aws_iam_role_policy" "ecs_task_policy" {
   # checkov:skip=CKV_AWS_290: ssmmessages actions do not support resource-level restrictions
   # checkov:skip=CKV_AWS_355: ssmmessages actions do not support resource-level restrictions
@@ -71,18 +91,7 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
         ]
         Resource = "arn:aws:s3:::${var.documents_bucket_name}/*"
       },
-
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:DescribeLogGroups",
-          "logs:CreateLogStream",
-          "logs:DescribeLogStreams",
-          "logs:PutLogEvents"
-        ]
-        Resource = "*"
-      },
-
+      
       {
         Effect = "Allow"
         Action = [
@@ -100,14 +109,6 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
           "sqs:SendMessage",
         ]
         Resource = var.sqs_queue_arn
-      },
-
-      {
-        Effect = "Allow"
-        Action = [
-          "secretsmanager:GetSecretValue",
-        ]
-        Resource = var.db_secret_arn
       }
     ]
   })
