@@ -75,6 +75,7 @@ module "compute" {
   db_name                                = var.db_name
   db_secret_arn                          = module.database.db_secret_arn
   ecr_repository_url                     = module.ecr.ecr_repository_url
+  ecr_flyway_repository_url              = module.ecr.ecr_flyway_repository_url
   sqs_queue_url                          = module.notifications.sqs_queue_url
   sqs_queue_arn                          = module.notifications.sqs_queue_arn
   documents_bucket_name                  = var.documents_bucket_name
