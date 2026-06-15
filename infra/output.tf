@@ -36,6 +36,12 @@ output "ecr_repository_url" {
   value       = module.ecr.ecr_repository_url
 }
 
+output "ecr_flyway_repository_url" {
+  description = "The URL of the ECR repository for Flyway"
+  value       = module.ecr.ecr_flyway_repository_url
+
+}
+
 # alb outputs
 output "alb_dns_name" {
   description = "The DNS name of the ALB"
