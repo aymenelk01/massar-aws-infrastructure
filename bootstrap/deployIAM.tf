@@ -82,7 +82,7 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
           "ecr:CompleteLayerUpload",
           "ecr:PutImage"
         ]
-        Resource =[
+        Resource = [
           "arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/ecr-repository-${var.environment}",
           "arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/flyway-repository-${var.environment}"
         ]
@@ -125,13 +125,38 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
         ]
       },
 
-       # SSM Parameter Store Read Access - scoped to the specific parameters for the application
+      # SSM Parameter Store Read Access - scoped to the specific parameters for the application
       {
         Sid    = "SSMReadCognitoParameters"
         Effect = "Allow"
         Action = ["ssm:GetParameter"]
         Resource = ["arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/massar/${var.environment}/cognito_user_pool_id",
           "arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/massar/${var.environment}/cognito_client_id"
+        ]
+      },
+
+      # Grants permission to read network configurations required for task placement
+      {
+        Sid    = "NetworkDiscovery"
+        Effect = "Allow"
+        Action = [
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeSubnets"
+        ]
+        Resource = "*"
+      },
+
+      # Grants permission to run and inspect specific Flyway database migration tasks
+      {
+        Sid    = "ECSFlywayTaskExecution"
+        Effect = "Allow"
+        Action = [
+          "ecs:DescribeTasks",
+          "ecs:RunTask"
+        ]
+        Resource = [
+          "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/${var.environment}-flyway-task:*",
+          "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${var.environment}-cluster"
         ]
       }
     ]
