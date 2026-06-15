@@ -92,3 +92,11 @@ jobs:
         if: github.event_name == 'push'
         run: terraform apply tfplan 
 
+      - name: Trigger static frontend redeployment
+        if: github.event_name == 'push'
+        run: |
+          curl -X POST \
+          -H "Authorization: token ${{ secrets.APP_REPO_DISPATCH_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/aymenelk01/massar-app/dispatches \
+          -d '{"event_type": "terraform-apply-completed"}'
