@@ -82,7 +82,10 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
           "ecr:CompleteLayerUpload",
           "ecr:PutImage"
         ]
-        Resource = "arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/ecr-repository-${var.environment}"
+        Resource =[
+          "arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/ecr-repository-${var.environment}",
+          "arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/ecr-flyway-repository-${var.environment}"
+        ]
       },
 
       # ECS Service Management - scoped to Massar service ARN
