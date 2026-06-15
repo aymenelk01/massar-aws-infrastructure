@@ -84,7 +84,7 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
         ]
         Resource =[
           "arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/ecr-repository-${var.environment}",
-          "arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/ecr-flyway-repository-${var.environment}"
+          "arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/flyway-repository-${var.environment}"
         ]
       },
 
