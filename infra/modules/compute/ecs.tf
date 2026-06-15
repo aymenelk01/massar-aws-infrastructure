@@ -32,6 +32,19 @@ resource "aws_ecs_task_definition" "app" {
   memory                   = "512"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
+
+  # Define volumes for the SSM agent to provide necessary storage for its operation
+      volume  {
+        name = "ssm-lib"
+      }
+
+      volume  {
+        name = "ssm-log"
+      }
+
+      volume  {
+        name = "managed-agents"
+      }
   
 
   container_definitions = jsonencode([
@@ -59,21 +72,6 @@ resource "aws_ecs_task_definition" "app" {
           readOnly      = false
         }
       ]
-
-      # Define volumes for the SSM agent to provide necessary storage for its operation
-      volume = {
-        name = "ssm-lib"
-      }
-
-      volume = {
-        name = "ssm-log"
-      }
-
-      volume = {
-        name = "managed-agents"
-      }
-
-
 
       portMappings = [
         {
