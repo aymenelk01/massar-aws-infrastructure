@@ -70,8 +70,8 @@ jobs:
 
       - name: Run TFLint
         run: |
-          tflint --init --config=infra/.tflint.hcl
-          tflint -f compact --config=infra/.tflint.hcl infra/
+          tflint --chdir=infra --init
+          tflint --chdir=infra -f compact
 
       - name: Run Checkov
         uses: bridgecrewio/checkov-action@v12
