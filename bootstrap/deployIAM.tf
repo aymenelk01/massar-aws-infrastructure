@@ -154,7 +154,7 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
           "ecs:DescribeTasks"
         ]
         Resource = [
-          "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${var.environment}-cluster/*"
+          "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task/${var.environment}-cluster/*"
         ]
       },
 
