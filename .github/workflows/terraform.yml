@@ -4,17 +4,17 @@ on:
     branches:
       - main
     paths:
-      - "infra/**"
+      - 'infra/**'  
 
   push:
     branches:
       - main
     paths:
-      - "infra/**"
+      - 'infra/**'    
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: true      
 
 permissions:
   contents: read
@@ -27,13 +27,13 @@ jobs:
       TF_VAR_environment: "dev"
       TF_VAR_aws_region: "eu-south-1"
       TF_VAR_db_name: "massardb"
-      TF_VAR_db_username: "aymenelk01"
+      TF_VAR_db_username: "aymenelk01" 
       TF_VAR_db_password: ${{ secrets.DATABASE_PASSWORD }} # Sensitive: pull from GitHub Secrets
       TF_VAR_documents_bucket_name: "app-massar-documents"
       TF_VAR_static_bucket_name: "app-massar-static"
       TF_VAR_state_bucket_name: "app-massar-state"
       TF_VAR_logs_bucket_name: "app-massar-logs"
-      TF_VAR_cloudfront_prefix_list_id: "pl-1bbc5972"
+      TF_VAR_cloudfront_prefix_list_id: "pl-1bbc5972" 
     defaults:
       run:
         working-directory: infra/
@@ -52,7 +52,7 @@ jobs:
         uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: 1.15.4
-          terraform_wrapper: false
+          terraform_wrapper: false    
 
       # Catch formatting syntax errors early
       - name: Terraform Format Check
@@ -67,17 +67,17 @@ jobs:
           tflint_version: "latest"
           cache: true
           tflint_config_path: "infra/.tflint.hcl"
-
+      
       - name: Run TFLint
         run: |
-          tflint --chdir=infra --init
-          tflint --chdir=infra -f compact
-
+          tflint --init
+          tflint -f compact  
+          
       - name: Run Checkov
         uses: bridgecrewio/checkov-action@v12
         with:
           directory: infra/
-          soft_fail: false
+          soft_fail: false    
 
       # Validate code integration without calling AWS APIs
       - name: Terraform Validate
@@ -90,4 +90,5 @@ jobs:
       # Apply only on push events to prevent unintended changes from PRs
       - name: Terraform Apply
         if: github.event_name == 'push'
-        run: terraform apply tfplan
+        run: terraform apply tfplan 
+
