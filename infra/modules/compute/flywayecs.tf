@@ -27,7 +27,7 @@ resource "aws_ecs_task_definition" "flyway" {
       environment = [
         {
           name  = "FLYWAY_URL"
-          value = "jdbc:mysql://${var.rds_proxy_endpoint}:3306/${var.db_name}"
+          value = "jdbc:mysql://${var.rds_proxy_endpoint}:3306/${var.db_name}?sslMode=REQUIRED" # Set the JDBC URL for the database connection, including the RDS Proxy endpoint, database name, and SSL mode to ensure secure communication between the Flyway migration task and the database, which is essential for protecting sensitive data during the migration process
         }
       ]
 
