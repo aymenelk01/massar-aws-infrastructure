@@ -25,7 +25,6 @@ resource "aws_ecs_cluster" "cluster" {
 
 # Create an ecs task definition for the application, specifying the container image, resource requirements, environment variables, and log configurationuration to send logs to CloudWatch Logs for monitoring and troubleshooting purposes
 resource "aws_ecs_task_definition" "app" {
-  # checkov:skip=CKV_AWS_336: Writable root filesystem is required for AWS ECS Exec (SSM Agent) to run.
   family                   = "${var.environment}-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
@@ -33,18 +32,15 @@ resource "aws_ecs_task_definition" "app" {
   memory                   = "512"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
-
-
+  
 
   container_definitions = jsonencode([
     {
       name                   = "massar-app"
       image                  = "${var.ecr_repository_url}:latest" # Use the latest tag for the container image, but consider using specific version tags for better control and stability in production environments
-      cpu                    = 256
-      memory                 = 512
       essential              = true
       readonlyRootFilesystem = true # Set to true to enhance security by preventing write access to the root filesystem, which is a best practice for container security, but ensure that any necessary writable directories are defined as volumes and mounted properly for the application to function correctly
-      
+
       # Define mount points for the SSM agent to allow it to function properly within the container, enabling features like ECS Exec for remote debugging and management of the tasks, which requires access to specific directories for storing agent data and logs, and ensuring that these directories are writable by the SSM agent for proper operation
       mountPoints = [
         {
