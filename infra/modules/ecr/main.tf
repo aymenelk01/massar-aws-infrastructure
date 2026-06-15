@@ -1,6 +1,6 @@
 resource "aws_ecr_repository" "massar_repo" {
   # checkov:skip=CKV_AWS_136: Portfolio project- AWS default encryption is sufficient for a portfolio project, so using the default AWS-managed encryption to avoid additional costs from a custom KMS key.
-  # checkov:skip=CKV_AWS_51: Tag immutability disabled by design — pipeline pushes both SHA and latest tags. Latest tag required for ECS bootstrap; SHA tags provide rollback capability
+  # checkov:skip=CKV_AWS_51: Tag immutability disabled by design — pipeline pushes both SHA and latest tags. SHA tags provide rollback capability and he requires mutability, while latest tags are used for ease of development and testing, and the lifecycle policy will manage old images to control costs.
   name                 = "ecr-repository-${var.environment}"
   image_tag_mutability = "MUTABLE"
 
@@ -54,4 +54,25 @@ resource "aws_ecr_lifecycle_policy" "cleanup_policy" {
     ]
 }
 EOF
+}
+
+# 
+resource "aws_ecr_repository" "flyway_repo" {
+  # checkov:skip=CKV_AWS_136: Portfolio project- AWS default encryption is sufficient for a portfolio project, so using the default AWS-managed encryption to avoid additional costs from a custom KMS key.
+  # checkov:skip=CKV_AWS_51: Tag immutability disabled by design — pipeline pushes both SHA and latest tags. SHA tags provide rollback capability and he requires mutability, while latest tags are used for ease of development and testing, and the lifecycle policy will manage old images to control costs.
+  name                 = "flyway-repository-${var.environment}"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  encryption_configuration {
+    encryption_type = "AES256"
+  }
+
+  tags = {
+    Name        = "ECRFlywayRepository-${var.environment}"
+    Environment = var.environment
+  }
 }
