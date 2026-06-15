@@ -151,13 +151,23 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
         Sid    = "ECSFlywayTaskExecution"
         Effect = "Allow"
         Action = [
-          "ecs:DescribeTasks",
-          "ecs:RunTask"
+          "ecs:DescribeTasks"
         ]
         Resource = [
-          "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/${var.environment}-flyway-task:*",
-          "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${var.environment}-cluster"
+          "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${var.environment}-cluster/*"
         ]
+      },
+
+      {
+        Sid      = "ECSRunFlywayMigration"
+        Effect   = "Allow"
+        Action   = ["ecs:RunTask"]
+        Resource = "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/${var.environment}-flyway-task:*"
+        Condition = {
+          ArnEquals = {
+            "ecs:cluster" = "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${var.environment}-cluster"
+          }
+        }
       }
     ]
   })
