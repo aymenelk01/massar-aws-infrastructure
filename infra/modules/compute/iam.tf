@@ -109,6 +109,14 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
           "sqs:SendMessage",
         ]
         Resource = var.sqs_queue_arn
+      },
+      
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ]
+        Resource = [var.db_secret_arn]
       }
     ]
   })
