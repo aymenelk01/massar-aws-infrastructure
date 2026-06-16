@@ -33,7 +33,6 @@ jobs:
       TF_VAR_static_bucket_name: "app-massar-static"
       TF_VAR_state_bucket_name: "app-massar-state"
       TF_VAR_logs_bucket_name: "app-massar-logs"
-      TF_VAR_cloudfront_prefix_list_id: "pl-1bbc5972"
     defaults:
       run:
         working-directory: infra/
