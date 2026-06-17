@@ -118,24 +118,36 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -out=tfplan -input=false
 
-      - name: Detect Cognito changes
-        id: cognito-changes
-        run: |
-          COGNITO_CHANGED=$(terraform show -json tfplan | \
-            jq '[.resource_changes[] | 
-              select(.type | startswith("aws_cognito")) | 
-              select(.change.actions[] | (contains("update") or contains("create")))] | 
-              length > 0')
-          echo "changed=$COGNITO_CHANGED" >> $GITHUB_OUTPUT
-
       - name: Terraform Apply
-        run: terraform apply tfplan
+        id: apply
+        run: |
+          set -o pipefail
+          terraform apply -json tfplan | tee apply_output.json
+
+      - name: Verify Cognito Deployment Status
+        id: verify-cognito
+        if: always()
+        run: |
+          if [ -f apply_output.json ]; then
+            COGNITO_SUCCESS=$(jq -s 'map(select(.type == "apply_complete" and .resource.type? and (.resource.type | startswith("aws_cognito")) and (.action == "create" or .action == "update"))) | length > 0' apply_output.json)
+            echo "applied=$COGNITO_SUCCESS" >> $GITHUB_OUTPUT
+          else
+            echo "applied=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Trigger static frontend redeployment
-        if: steps.cognito-changes.outputs.changed == 'true'
+        if: always() && steps.verify-cognito.outputs.applied == 'true'
         run: |
           curl -X POST \
           -H "Authorization: token ${{ secrets.APP_REPO_DISPATCH_TOKEN }}" \
           -H "Accept: application/vnd.github.v3+json" \
           https://api.github.com/repos/aymenelk01/massar-app/dispatches \
           -d '{"event_type": "terraform-apply-completed"}'
+
+      - name: Enforce Pipeline Status
+        if: always()
+        run: |
+          if [ "${{ steps.apply.outcome }}" == "failure" ]; then
+            echo "Terraform Apply failed. Enforcing execution failure status."
+            exit 1
+          fi
