@@ -1,6 +1,6 @@
 # This module sets up AWS Cognito for user authentication and management.
 
-# Create a Cognito user pool for the application 
+# Create a Cognito user pool for the application to manage user authentication and authorization, which provides a secure and scalable way to handle user sign-up, sign-in, and access control for the application.
 resource "aws_cognito_user_pool" "massar_pool" {
   name = "massar-pool-${var.environment}"
 
