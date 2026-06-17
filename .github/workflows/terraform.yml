@@ -122,7 +122,7 @@ jobs:
         id: apply
         run: |
           set -o pipefail
-          terraform apply -json tfplan | tee apply_output.json
+          terraform apply -json tfplan | tee apply_output.json | jq --unbuffered -r '.["@message"] // empty'
 
       - name: Verify Cognito Deployment Status
         id: verify-cognito
