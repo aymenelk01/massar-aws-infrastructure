@@ -4,6 +4,7 @@ resource "aws_secretsmanager_secret" "credential_secret" {
   # checkov:skip=CKV_AWS_149: Portfolio project- AWS default encryption is sufficient for a portfolio project, so using the default AWS-managed encryption to avoid additional costs from a custom KMS key.
     name = "db-credentials-${var.environment}"
     description = "Secret for RDS database credentials for ${var.environment} environment"
+    recovery_window_in_days = 0 # Forces immediate deletion when run terraform destroy, which is acceptable for a portfolio project
     
 
     tags = {
