@@ -129,7 +129,7 @@ jobs:
         if: always()
         run: |
           if [ -f apply_output.json ]; then
-            COGNITO_SUCCESS=$(jq -s 'map(select(.type == "apply_complete" and .resource.type? and (.resource.type | startswith("aws_cognito")) and (.action == "create" or .action == "update"))) | length > 0' apply_output.json)
+            COGNITO_SUCCESS=$(jq -s 'map(select(.type == "apply_complete" and .hook?.resource?.resource_type? and (.hook.resource.resource_type | startswith("aws_cognito")) and (.hook.action == "create" or .hook.action == "update"))) | length > 0' apply_output.json)
             echo "applied=$COGNITO_SUCCESS" >> $GITHUB_OUTPUT
           else
             echo "applied=false" >> $GITHUB_OUTPUT

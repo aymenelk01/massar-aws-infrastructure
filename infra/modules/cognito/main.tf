@@ -2,7 +2,7 @@
 
 # Create a Cognito user pool for the application to manage user authentication and authorization, which provides a secure and scalable way to handle user sign-up, sign-in, and access control for the application.
 resource "aws_cognito_user_pool" "massar_pool" {
-  name = "massar-pool-${var.environment}"
+  name = "massar-users-pool-${var.environment}"
 
   admin_create_user_config {
     allow_admin_create_user_only = true # only allow administrators to create user accounts, which can help improve security by preventing unauthorized user registration and ensuring that user accounts are created and managed in a controlled manner.
