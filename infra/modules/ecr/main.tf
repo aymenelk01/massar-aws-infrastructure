@@ -79,7 +79,7 @@ resource "aws_ecr_repository" "flyway_repo" {
 }
 
 # create a lifecycle policy for the ECR repository to automatically clean up old images and manage storage costs, while keeping recent images for rollback safety
-resource "aws_ecr_lifecycle_policy" "cleanup_policy" {
+resource "aws_ecr_lifecycle_policy" "flyway_cleanup_policy" {
   repository = aws_ecr_repository.flyway_repo.name
 
   policy = <<EOF
