@@ -124,6 +124,10 @@ jobs:
           set -o pipefail
           terraform apply -json tfplan | tee apply_output.json | jq --unbuffered -r '.["@message"] // empty'
 
+      - name: Show Terraform Outputs
+        if: steps.apply.outcome == 'success'
+        run: terraform output
+
       - name: Verify Cognito Deployment Status
         id: verify-cognito
         if: always()
