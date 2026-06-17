@@ -10,7 +10,6 @@ module "security" {
   source                    = "./modules/security"
   environment               = var.environment
   vpc_id                    = module.vpc.vpc_id
-  cloudfront_prefix_list_id = var.cloudfront_prefix_list_id
   vpc_cidr_block            = module.vpc.vpc_cidr_block
 }
 

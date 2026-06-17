@@ -54,10 +54,6 @@ variable "logs_bucket_name" {
   type        = string
 }
 
-variable "cloudfront_prefix_list_id" {
-  description = "The ID of the AWS-managed prefix list for CloudFront"
-  type        = string
-}
 
 /* # uncomment this variable and provide the ARN of the SSL certificate to enable HTTPS for the ALB
 variable "certificate_arn" {
