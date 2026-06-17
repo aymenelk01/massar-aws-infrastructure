@@ -10,12 +10,6 @@ variable "vpc_id" {
     type = string
 }
 
-# variable of the managed prefix list for CloudFront
-variable "cloudfront_prefix_list_id" {
-    description = "The ID of the AWS-managed prefix list for CloudFront"
-    type = string
-}
-
 variable "vpc_cidr_block" {
     description = "The CIDR block of the VPC"
     type = string

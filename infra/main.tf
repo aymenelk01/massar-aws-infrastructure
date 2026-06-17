@@ -7,11 +7,10 @@ module "vpc" {
 
 # call the security module and pass the vpc id from the vpc module
 module "security" {
-  source                    = "./modules/security"
-  environment               = var.environment
-  vpc_id                    = module.vpc.vpc_id
-  cloudfront_prefix_list_id = var.cloudfront_prefix_list_id
-  vpc_cidr_block            = module.vpc.vpc_cidr_block
+  source         = "./modules/security"
+  environment    = var.environment
+  vpc_id         = module.vpc.vpc_id
+  vpc_cidr_block = module.vpc.vpc_cidr_block
 }
 
 module "endpoints" {
