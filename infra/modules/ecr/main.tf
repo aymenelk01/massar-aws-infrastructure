@@ -21,6 +21,7 @@ resource "aws_ecr_repository" "massar_repo" {
 # create a lifecycle policy for the ECR repository to automatically clean up old images and manage storage costs, while keeping recent images for rollback safety
 resource "aws_ecr_lifecycle_policy" "cleanup_policy" {
   repository = aws_ecr_repository.massar_repo.name
+  
 
   policy = <<EOF
 {
@@ -75,4 +76,42 @@ resource "aws_ecr_repository" "flyway_repo" {
     Name        = "ECRFlywayRepository-${var.environment}"
     Environment = var.environment
   }
+}
+
+# create a lifecycle policy for the ECR repository to automatically clean up old images and manage storage costs, while keeping recent images for rollback safety
+resource "aws_ecr_lifecycle_policy" "cleanup_policy" {
+  repository = aws_ecr_repository.flyway_repo.name
+
+  policy = <<EOF
+{
+    "rules": [
+        {
+            "rulePriority": 1,
+            "description": "Keep only the last 5 images tagged with a Git SHA for rollback safety",
+            "selection": {
+                "tagStatus": "tagged",
+                "tagPatternList": ["sha-*"], 
+                "countType": "imageCountMoreThan",
+                "countNumber": 5
+            },
+            "action": {
+                "type": "expire"
+            }
+        },
+        {
+            "rulePriority": 2,
+            "description": "Immediately delete orphaned untagged images to save storage costs",
+            "selection": {
+                "tagStatus": "untagged",
+                "countType": "sinceImagePushed",
+                "countUnit": "days",
+                "countNumber": 1
+            },
+            "action": {
+                "type": "expire"
+            }
+        }
+    ]
+}
+EOF
 }

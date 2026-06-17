@@ -20,23 +20,28 @@ permissions:
   contents: read
   id-token: write
 
+env:
+  TF_VAR_environment: "dev"
+  TF_VAR_aws_region: "eu-south-1"
+  TF_VAR_db_name: "massardb"
+  TF_VAR_db_username: "aymenelk01"
+  TF_VAR_db_password: ${{ secrets.DATABASE_PASSWORD }} # Sensitive: pull from GitHub Secrets
+  TF_VAR_documents_bucket_name: "app-massar-documents"
+  TF_VAR_static_bucket_name: "app-massar-static"
+  TF_VAR_state_bucket_name: "app-massar-state"
+  TF_VAR_logs_bucket_name: "app-massar-logs"
+
+defaults:
+  run:
+    working-directory: infra/
+
 jobs:
-  terraform-pipeline:
+  # ==========================================
+  # Job 1: CI (Runs only on Pull Requests)
+  # ==========================================
+  terraform-validate:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    env:
-      TF_VAR_environment: "dev"
-      TF_VAR_aws_region: "eu-south-1"
-      TF_VAR_db_name: "massardb"
-      TF_VAR_db_username: "aymenelk01"
-      TF_VAR_db_password: ${{ secrets.DATABASE_PASSWORD }} # Sensitive: pull from GitHub Secrets
-      TF_VAR_documents_bucket_name: "app-massar-documents"
-      TF_VAR_static_bucket_name: "app-massar-static"
-      TF_VAR_state_bucket_name: "app-massar-state"
-      TF_VAR_logs_bucket_name: "app-massar-logs"
-      TF_VAR_cloudfront_prefix_list_id: "pl-1bbc5972"
-    defaults:
-      run:
-        working-directory: infra/
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -46,7 +51,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_TERRAFORM_ROLE_ARN }}
           aws-region: eu-south-1
-          role-session-name: github-actions-terraform
+          role-session-name: github-actions-terraform-validation
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
@@ -54,7 +59,6 @@ jobs:
           terraform_version: 1.15.4
           terraform_wrapper: false
 
-      # Catch formatting syntax errors early
       - name: Terraform Format Check
         run: terraform fmt -check
 
@@ -72,17 +76,45 @@ jobs:
         run: |
           tflint --init
           tflint -f compact
+
       - name: Run Checkov
         uses: bridgecrewio/checkov-action@v12
         with:
           directory: infra/
           soft_fail: false
 
-      # Validate code integration without calling AWS APIs
       - name: Terraform Validate
         run: terraform validate
 
-      # Save plan file to ensure 'apply' executes exactly what was approved
+      - name: Terraform Plan
+        run: terraform plan -input=false
+
+  # ==========================================
+  # Job 2: CD (Runs only on pushes/merges to main)
+  # ==========================================
+  terraform-deploy:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_TERRAFORM_ROLE_ARN }}
+          aws-region: eu-south-1
+          role-session-name: github-actions-terraform-deployment
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.15.4
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
       - name: Terraform Plan
         run: terraform plan -out=tfplan -input=false
 
@@ -96,13 +128,11 @@ jobs:
               length > 0')
           echo "changed=$COGNITO_CHANGED" >> $GITHUB_OUTPUT
 
-      # Apply only on push events to prevent unintended changes from PRs
       - name: Terraform Apply
-        if: github.event_name == 'push'
         run: terraform apply tfplan
 
       - name: Trigger static frontend redeployment
-        if: github.event_name == 'push' && steps.cognito-changes.outputs.changed == 'true'
+        if: steps.cognito-changes.outputs.changed == 'true'
         run: |
           curl -X POST \
           -H "Authorization: token ${{ secrets.APP_REPO_DISPATCH_TOKEN }}" \
