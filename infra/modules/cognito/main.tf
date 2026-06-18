@@ -29,7 +29,7 @@ resource "aws_cognito_user_pool" "massar_pool" {
 
 # Create a user pool client for the Cognito user pool to allow the application to interact with the user pool
 resource "aws_cognito_user_pool_client" "massar_client" {
-  name         = "massar-client-${var.environment}"
+  name         = "massar-users-client-${var.environment}"
   user_pool_id = aws_cognito_user_pool.massar_pool.id
 
   explicit_auth_flows = [
