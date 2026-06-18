@@ -41,14 +41,3 @@ resource "aws_cognito_user_pool_client" "massar_client" {
   generate_secret = false # set to true if you want to generate a client secret for the user pool client, which is required for certain authentication flows (e.g., client credentials flow)
 
 }
-
-# create user groups for the Cognito user pool for teachers and admins to manage user roles and permissions, which allows for better organization and control over user access to resources within the application.
-resource "aws_cognito_user_group" "admins" {
-  name         = "admins"
-  user_pool_id = aws_cognito_user_pool.massar_pool.id
-}
-
-resource "aws_cognito_user_group" "teachers" {
-  name         = "teachers"
-  user_pool_id = aws_cognito_user_pool.massar_pool.id
-}
