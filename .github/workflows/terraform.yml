@@ -150,7 +150,7 @@ jobs:
           export COGNITO_USER_POOL_ID=$(terraform output -raw user_pool_id)
 
           # 3. Run the bash script to create the admin user in the Cognito User Pool
-          ../scripts/setup-cognito-admin.sh
+          ./scripts/setup-cognito-admin.sh
 
       - name: Trigger static frontend redeployment
         # Runs ONLY if Cognito was successfully deployed or updated regardless of the Terraform Apply outcome
