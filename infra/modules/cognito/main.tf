@@ -42,12 +42,13 @@ resource "aws_cognito_user_pool_client" "massar_client" {
 
 }
 
-# create user groups for the Cognito user pool for teachers and admins to manage user roles and permissions, which allows for better organization and control over user access to resources within the application.
+# create a user group for administrators to manage user roles and permissions, which allows for better organization and control over user access to resources within the application.
 resource "aws_cognito_user_group" "admins" {
   name         = "admins"
   user_pool_id = aws_cognito_user_pool.massar_pool.id
 }
 
+# create a user group for teachers to manage user roles and permissions, which allows for better organization and control over user access to resources within the application.
 resource "aws_cognito_user_group" "teachers" {
   name         = "teachers"
   user_pool_id = aws_cognito_user_pool.massar_pool.id
