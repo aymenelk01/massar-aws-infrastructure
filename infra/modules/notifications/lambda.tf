@@ -33,6 +33,7 @@ resource "aws_lambda_function" "notifications_lambda" {
   environment {
     variables = {
       SNS_TOPIC_ARN = aws_sns_topic.notifications_topic.arn
+      SES_SENDER_EMAIL = "aymenelkharchi15@gmail.com"
     }
   }
 
