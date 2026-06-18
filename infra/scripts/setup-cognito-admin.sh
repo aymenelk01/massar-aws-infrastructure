@@ -4,7 +4,7 @@ set -e
 export AWS_PAGER=""
 
 
-USER_POOL_ID="eu-south-1_bWMNQmJaV" # Replace with your User Pool ID
+USER_POOL_ID=$COGNITO_USER_POOL_ID
 REGION="eu-south-1"
 GROUP_NAME="admins"
 USERNAME="admin"
