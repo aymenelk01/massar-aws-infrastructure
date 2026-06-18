@@ -4,13 +4,13 @@ on:
     branches:
       - main
     paths:
-      - 'infra/**'
+      - "infra/**"
 
   push:
     branches:
       - main
     paths:
-      - 'infra/**'
+      - "infra/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -71,7 +71,7 @@ jobs:
           tflint_version: "latest"
           cache: true
           tflint_config_path: "infra/.tflint.hcl"
-      
+
       - name: Run TFLint
         run: |
           tflint --init
@@ -139,7 +139,21 @@ jobs:
             echo "applied=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Create admin user account in Cognito
+        # Runs ONLY if Cognito was successfully deployed or updated regardless of the Terraform Apply outcome
+        if: always() && steps.verify-cognito.outputs.applied == 'true'
+        run: |
+          # 1. Give the script executable permissions
+          chmod +x ../scripts/setup-cognito-admin.sh
+
+          # 2. Extract the live pool ID from Terraform and map it to your script variable
+          export COGNITO_USER_POOL_ID=$(terraform output -raw user_pool_id)
+
+          # 3. Run the bash script to create the admin user in the Cognito User Pool
+          ../scripts/setup-cognito-admin.sh
+
       - name: Trigger static frontend redeployment
+        # Runs ONLY if Cognito was successfully deployed or updated regardless of the Terraform Apply outcome
         if: always() && steps.verify-cognito.outputs.applied == 'true'
         run: |
           curl -X POST \
@@ -152,6 +166,6 @@ jobs:
         if: always()
         run: |
           if [ "${{ steps.apply.outcome }}" == "failure" ]; then
-            echo "Terraform Apply failed. Enforcing execution failure status."
+            echo "Terraform Apply failed with error. Please check the logs for details."
             exit 1
           fi

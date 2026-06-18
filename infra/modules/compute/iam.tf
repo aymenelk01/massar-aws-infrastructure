@@ -125,7 +125,9 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
     "cognito-idp:AdminAddUserToGroup",
     "cognito-idp:AdminSetUserPassword",
     "cognito-idp:AdminDeleteUser",
-    "cognito-idp:AdminUpdateUserAttributes"
+    "cognito-idp:AdminUpdateUserAttributes",
+    "cognito-idp:AdminDisableUser",
+    "cognito-idp:AdminEnableUser",
   ]
   Resource = "arn:aws:cognito-idp:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userpool/${var.user_pool_id}"
 }
