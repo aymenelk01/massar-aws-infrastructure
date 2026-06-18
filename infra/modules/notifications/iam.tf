@@ -22,6 +22,8 @@ resource "aws_iam_role" "lambda_role" {
 }
 
 resource "aws_iam_role_policy" "lambda_policy" {
+  #checkov:skip=CKV_AWS_355:sns:Publish requires Resource = "*" for direct SMS publishing to phone numbers — AWS does not support resource-level restrictions for this operation
+  #checkov:skip=CKV_AWS_290:sns:Publish requires Resource = "*" for direct SMS publishing to phone numbers — AWS does not support resource-level restrictions for this operation
   name = "${var.environment}-notifications-lambda-policy"
   role = aws_iam_role.lambda_role.id
 
@@ -54,7 +56,15 @@ resource "aws_iam_role_policy" "lambda_policy" {
         Action = [
           "sns:Publish"
         ]
-        Resource = aws_sns_topic.notifications_topic.arn
+        Resource = ["*"]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ses:SendEmail",
+          "ses:SendRawEmail",
+        ]
+        Resource = "arn:aws:ses:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:identity/aymenelkharchi15@gmail.com"
       }
     ]
   })
