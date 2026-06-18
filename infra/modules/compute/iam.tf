@@ -91,7 +91,7 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
         ]
         Resource = "arn:aws:s3:::${var.documents_bucket_name}/*"
       },
-      
+
       {
         Effect = "Allow"
         Action = [
@@ -117,20 +117,20 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
           "secretsmanager:GetSecretValue"
         ]
         Resource = [var.db_secret_arn]
-      }, 
+      },
       {
-  Effect = "Allow"
-  Action = [
-    "cognito-idp:AdminCreateUser",
-    "cognito-idp:AdminAddUserToGroup",
-    "cognito-idp:AdminSetUserPassword",
-    "cognito-idp:AdminDeleteUser",
-    "cognito-idp:AdminUpdateUserAttributes",
-    "cognito-idp:AdminDisableUser",
-    "cognito-idp:AdminEnableUser",
-  ]
-  Resource = "arn:aws:cognito-idp:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userpool/${var.user_pool_id}"
-}
+        Effect = "Allow"
+        Action = [
+          "cognito-idp:AdminCreateUser",
+          "cognito-idp:AdminAddUserToGroup",
+          "cognito-idp:AdminSetUserPassword",
+          "cognito-idp:AdminDeleteUser",
+          "cognito-idp:AdminUpdateUserAttributes",
+          "cognito-idp:AdminDisableUser",
+          "cognito-idp:AdminEnableUser",
+        ]
+        Resource = "arn:aws:cognito-idp:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userpool/${var.user_pool_id}"
+      }
     ]
   })
 }
