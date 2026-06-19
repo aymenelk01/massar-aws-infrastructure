@@ -16,17 +16,10 @@ variable "db_name" {
   type        = string
 }
 
-# variable of the database username for the RDS instance
+# variable of the database username for the aurora cluster
 variable "db_username" {
-  description = "The database username for the RDS instance"
+  description = "The username of the database"
   type        = string
-}
-
-# variable of the database password for the RDS instance
-variable "db_password" {
-  description = "The database password for the RDS instance"
-  type        = string
-  sensitive   = true
 }
 
 # variable of the bucket name
