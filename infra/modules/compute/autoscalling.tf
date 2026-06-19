@@ -16,7 +16,7 @@ resource "aws_appautoscaling_policy" "ecs_scaling_policy" {
   scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
   service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
 
-  
+
 
   target_tracking_scaling_policy_configuration {
     target_value = 75

@@ -34,18 +34,18 @@ resource "aws_ecs_task_definition" "app" {
   task_role_arn            = aws_iam_role.ecs_task_role.arn
 
   # Define volumes for the SSM agent to provide necessary storage for its operation
-      volume  {
-        name = "ssm-lib"
-      }
+  volume {
+    name = "ssm-lib"
+  }
 
-      volume  {
-        name = "ssm-log"
-      }
+  volume {
+    name = "ssm-log"
+  }
 
-      volume  {
-        name = "managed-agents"
-      }
-  
+  volume {
+    name = "managed-agents"
+  }
+
 
   container_definitions = jsonencode([
     {
@@ -87,8 +87,8 @@ resource "aws_ecs_task_definition" "app" {
         { name = "ELASTICACHE_ENDPOINT", value = var.elasticache_replication_group_endpoint },
         { name = "RDS_PROXY_ENDPOINT", value = var.rds_proxy_endpoint },
         { name = "DB_NAME", value = var.db_name },
+        { name = "DB_USERNAME", value = var.db_iam_username },
         { name = "SQS_QUEUE_URL", value = var.sqs_queue_url },
-        { name = "DB_SECRET_ARN", value = var.db_secret_arn },
         { name = "ENVIRONMENT", value = var.environment },
         { name = "AWS_REGION", value = data.aws_region.current.region }
       ]
