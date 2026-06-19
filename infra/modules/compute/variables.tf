@@ -77,8 +77,19 @@ variable "sqs_queue_arn" {
   type        = string
 }
 
-variable "db_secret_arn" {
-  description = "The ARN of the database secret in Secrets Manager"
+variable "db_iam_username" {
+  description = "The username of the database"
+  type        = string
+  default     = "db_iam_user"
+}
+
+variable "db_password_secret_arn" {
+  description = "The ARN of the database password secret"
+  type        = string
+}
+
+variable "rds_proxy_resource_id" {
+  description = "The resource ID of the RDS Proxy"
   type        = string
 }
 
