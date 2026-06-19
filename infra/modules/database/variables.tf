@@ -21,12 +21,6 @@ variable "db_username" {
     type = string
 }
 
-# variable of the database password for the RDS instance
-variable "db_password" {
-    description = "The database password for the RDS instance"
-    type = string
-    sensitive = true
-}
 
 variable "rdsproxy_sg_id" {
     description = "The ID of the security group for the RDS Proxy"
