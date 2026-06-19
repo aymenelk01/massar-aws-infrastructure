@@ -54,9 +54,9 @@ resource "aws_db_proxy" "proxy" {
   # configure authentication for the RDS Proxy to use the credentials stored in Secrets Manager
   auth {
     auth_scheme = "SECRETS" # use Secrets Manager for authentication to securely manage database credentials and avoid hardcoding them in the application code or configuration files
-    description = "Authentication for RDS Proxy using Secrets Manager"
-    iam_auth    = "DISABLED" # disable IAM authentication to use only Secrets Manager for authentication, which is more secure and easier to manage for database credentials
-    secret_arn  = aws_secretsmanager_secret.credential_secret.arn
+    description = "Authentication for RDS Proxy using end to end IAM authentication to access the Aurora cluster "
+    iam_auth    =  "REQUIRED" # require IAM authentication for added security and to prevent unauthorized access to the database
+    secret_arn  = aws_rds_cluster.aurora.master_user_secret.secret_arn
   }
 
   tags = {
