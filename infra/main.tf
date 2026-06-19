@@ -38,7 +38,6 @@ module "database" {
   private_db_subnet_ids = module.vpc.private_db_subnet_ids
   db_name               = var.db_name
   db_username           = var.db_username
-  db_password           = var.db_password
   aurora_sg_id          = module.security.aurora_sg_id
   rdsproxy_sg_id        = module.security.rdsproxy_sg_id
 }
@@ -72,7 +71,8 @@ module "compute" {
   elasticache_replication_group_endpoint = module.cache.elasticache_replication_group_endpoint
   rds_proxy_endpoint                     = module.database.rds_proxy_endpoint
   db_name                                = var.db_name
-  db_secret_arn                          = module.database.db_secret_arn
+  db_password_secret_arn                 = module.database.db_password_secret_arn
+  rds_proxy_resource_id                   = module.database.rds_proxy_resource_id
   ecr_repository_url                     = module.ecr.ecr_repository_url
   ecr_flyway_repository_url              = module.ecr.ecr_flyway_repository_url
   sqs_queue_url                          = module.notifications.sqs_queue_url
