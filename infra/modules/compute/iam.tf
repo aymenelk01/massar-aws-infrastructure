@@ -23,31 +23,79 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   }
 }
 
-# Custom policy to allow the ECS Agent to fetch and decrypt the db credentials at boot
-resource "aws_iam_role_policy" "ecs_execution_secrets_policy" {
-  name = "ecs-execution-secrets-policy-${var.environment}"
-  role = aws_iam_role.ecs_task_execution_role.id
+# --- Flyway-dedicated execution role -------------------------------------------
+# Flyway needs its own execution role because it injects FLYWAY_USER and
+# FLYWAY_PASSWORD from Secrets Manager at container start. The app execution
+# role must NOT have this permission — the app authenticates via IAM token
+# and never touches the master-user secret.
 
-  policy = jsonencode({
+resource "aws_iam_role" "flyway_execution_role" {
+  name = "flywayExecutionRole-${var.environment}"
+
+  assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
         Effect = "Allow"
-        Action = [
-          "secretsmanager:GetSecretValue"
-        ]
-        Resource = [var.db_secret_arn]
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
       }
     ]
   })
-}
 
+  tags = {
+    Name        = "flywayExecutionRole-${var.environment}"
+    Environment = var.environment
+  }
+}
 
 # attach the AmazonECSTaskExecutionRolePolicy managed policy to the ECS role
 resource "aws_iam_role_policy_attachment" "ecs_role_policy_attachment" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
+
+
+
+
+
+
+# Allow the Flyway ECS agent to pull the image and send logs (same as the app
+# execution role — both need the AWS-managed ECS execution policy).
+resource "aws_iam_role_policy_attachment" "flyway_execution_role_policy" {
+  role       = aws_iam_role.flyway_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+# Allow the Flyway ECS agent to resolve FLYWAY_USER and FLYWAY_PASSWORD from
+# Secrets Manager. Scoped to the master-user secret only.
+resource "aws_iam_role_policy" "flyway_execution_secrets_policy" {
+  name = "flyway-execution-secrets-policy-${var.environment}"
+  role = aws_iam_role.flyway_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
+        Resource = [var.db_password_secret_arn]
+      }
+    ]
+  })
+}
+
+
+
+
+
+
+
+
+
+
 
 
 # ceate an IAM role for the ecs tasks 
@@ -73,7 +121,12 @@ resource "aws_iam_role" "ecs_task_role" {
   }
 }
 
-# create a custom policy for the ECS role to allow it to access the S3 bucket for the documents files and to send logs to CloudWatch Logs, and to allow it to use SSM for ECS Exec, and to allow it to send messages to the SQS queue, and to allow it to access the database credentials stored in Secrets Manager
+# Create a custom policy for the ECS task role to allow it to:
+# - access S3 for document storage
+# - use SSM for ECS Exec
+# - send messages to SQS
+# - call Cognito admin APIs
+# - authenticate to Aurora via IAM token (rds-db:connect as db_iam_user)
 resource "aws_iam_role_policy" "ecs_task_policy" {
   # checkov:skip=CKV_AWS_290: ssmmessages actions do not support resource-level restrictions
   # checkov:skip=CKV_AWS_355: ssmmessages actions do not support resource-level restrictions
@@ -110,14 +163,6 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
         ]
         Resource = var.sqs_queue_arn
       },
-      
-      {
-        Effect = "Allow"
-        Action = [
-          "secretsmanager:GetSecretValue"
-        ]
-        Resource = [var.db_secret_arn]
-      },
       {
         Effect = "Allow"
         Action = [
@@ -130,6 +175,15 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
           "cognito-idp:AdminEnableUser",
         ]
         Resource = "arn:aws:cognito-idp:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:userpool/${var.user_pool_id}"
+      },
+
+      {
+        Effect = "Allow"
+        Action = ["rds-db:connect"
+        ]
+        Resource = [
+          "arn:aws:rds-db:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:dbuser:${var.rds_proxy_resource_id}/db_iam_user"
+        ]
       }
     ]
   })
