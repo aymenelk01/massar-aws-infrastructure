@@ -93,6 +93,18 @@ variable "rds_proxy_resource_id" {
   type        = string
 }
 
+variable "documents_sqs_queue_url" {
+  description = "The URL of the SQS queue for documents"
+  type        = string
+}
+
+variable "documents_sqs_queue_arn" {
+  description = "The ARN of the SQS queue for documents"
+  type        = string
+}
+
+
+
 # variable of the AWS region
 variable "aws_region" {
   description = "The AWS region"

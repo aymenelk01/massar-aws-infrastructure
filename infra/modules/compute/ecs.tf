@@ -88,7 +88,9 @@ resource "aws_ecs_task_definition" "app" {
         { name = "RDS_PROXY_ENDPOINT", value = var.rds_proxy_endpoint },
         { name = "DB_NAME", value = var.db_name },
         { name = "DB_USERNAME", value = var.db_iam_username },
-        { name = "SQS_QUEUE_URL", value = var.sqs_queue_url },
+        { name = "NOTIFICATION_SQS_QUEUE_URL", value = var.sqs_queue_url },
+        { name = "DOCUMENTS_SQS_QUEUE_URL", value = var.documents_sqs_queue_url },
+        { name = "DOCUMENTS_BUCKET_NAME", value = var.documents_bucket_name },
         { name = "ENVIRONMENT", value = var.environment },
         { name = "AWS_REGION", value = data.aws_region.current.region }
       ]

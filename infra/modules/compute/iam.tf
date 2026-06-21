@@ -161,7 +161,10 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
         Action = [
           "sqs:SendMessage",
         ]
-        Resource = var.sqs_queue_arn
+        Resource = [
+          var.sqs_queue_arn,
+          var.documents_sqs_queue_arn
+        ]
       },
       {
         Effect = "Allow"
