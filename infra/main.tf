@@ -70,6 +70,7 @@ module "compute" {
   user_pool_client_id                    = module.cognito.user_pool_client_id
   elasticache_replication_group_endpoint = module.cache.elasticache_replication_group_endpoint
   rds_proxy_endpoint                     = module.database.rds_proxy_endpoint
+  aurora_cluster_endpoint                = module.database.aurora_cluster_endpoint
   db_name                                = var.db_name
   db_password_secret_arn                 = module.database.db_password_secret_arn
   rds_proxy_resource_id                  = module.database.rds_proxy_resource_id
