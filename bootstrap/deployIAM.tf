@@ -121,7 +121,8 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
         ]
         Resource = [
           "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ecsRole-${var.environment}",
-          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ecsTaskRole-${var.environment}"
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ecsTaskRole-${var.environment}",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/flywayExecutionRole-${var.environment}"
         ]
       },
 
