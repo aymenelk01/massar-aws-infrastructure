@@ -70,6 +70,12 @@ resource "aws_s3_bucket_lifecycle_configuration" "documents_files_lifecycle" {
       days          = 365
       storage_class = "GLACIER"
     }
+
+    # Specifies configuration to expire non-current object versions
+    noncurrent_version_expiration {
+      noncurrent_days           = 30  # Expire non-current versions after 30 days
+      newer_noncurrent_versions = 3   # Keep the 3 most recent non-current versions
+    }
   }
 }
 
