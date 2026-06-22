@@ -18,7 +18,7 @@ provider "aws" {
       Environment = var.environment
       Project     = "Massar"
       ManagedBy   = "Terraform"
-      Service     = "Massar"
+      Service     = var.service
     }
   }
 }
@@ -33,7 +33,7 @@ provider "aws" {
       Environment = var.environment
       Project     = "Massar"
       ManagedBy   = "Terraform"
-      Service     = "Massar"
+      Service     = var.service
     }
   }
 }
