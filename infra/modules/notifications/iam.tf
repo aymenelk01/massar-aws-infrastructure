@@ -64,7 +64,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "ses:SendEmail",
           "ses:SendRawEmail",
         ]
-        Resource = "arn:aws:ses:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:identity/aymenelkharchi15@gmail.com"
+        Resource = "arn:aws:ses:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:identity/*"
       }
     ]
   })

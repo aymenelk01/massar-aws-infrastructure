@@ -10,10 +10,10 @@ resource "aws_cloudfront_distribution" "cdn" {
   # checkov:skip=CKV_AWS_310: This is a portfolio project; multi-region redundancy is disabled to optimize costs
   # checkov:skip=CKV_AWS_374: CloudFront geo restriction — already documented: VPN bypass renders it ineffective
   # checkov:skip=CKV_AWS_305: No default root object — default origin is ALB, not S3. Root redirect handled by CloudFront Function rewriting / to /static/index.html
-  enabled    = true
-  web_acl_id = aws_wafv2_web_acl.waf.arn
-  comment    = "CloudFront distribution for static files-${var.environment}"
-  default_root_object = "index.html" 
+  enabled             = true
+  web_acl_id          = aws_wafv2_web_acl.waf.arn
+  comment             = "CloudFront distribution for static files-${var.environment}"
+  default_root_object = "index.html"
 
 
 
@@ -52,7 +52,7 @@ resource "aws_cloudfront_distribution" "cdn" {
 
   # configure a cache behavior to forward requests to the ALB for dynamic content
   ordered_cache_behavior {
-    path_pattern = "/api/*" # this will forward all requests that start with /api/ to the ALB, allowing it to handle the dynamic content requests. You can adjust this path pattern based on your application's routing structure and requirements.
+    path_pattern           = "/api/*" # this will forward all requests that start with /api/ to the ALB, allowing it to handle the dynamic content requests. You can adjust this path pattern based on your application's routing structure and requirements.
     target_origin_id       = "ALBorigins"
     viewer_protocol_policy = "redirect-to-https"
     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]

@@ -1,43 +1,46 @@
 # RDS Proxy configuration to optimize database connections and improve performance for the Aurora cluster
 resource "aws_iam_role" "rdsproxy_role" {
-    name = "rdsproxy-role-${var.environment}"
-    
-    assume_role_policy = jsonencode({
-        Version = "2012-10-17"
-        Statement = [
-        {
-            Effect = "Allow"
-            Principal = {
-            Service = "rds.amazonaws.com"
-            }
-            Action = "sts:AssumeRole"
+  name = "rdsproxy-role-${var.environment}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "rds.amazonaws.com"
         }
-        ]
-    })
-    
-    tags = {
-        Name        = "RDSProxyRole-${var.environment}"
-        Environment = var.environment
-    }
-  
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = {
+    Name        = "RDSProxyRole-${var.environment}"
+    Environment = var.environment
+  }
+
 }
 
 resource "aws_iam_role_policy" "rdsproxy_policy" {
-   name = "rdsproxy-policy-${var.environment}"
-   role = aws_iam_role.rdsproxy_role.id
-    policy = jsonencode({
-         Version = "2012-10-17"
-         Statement = [
-         {
-              Effect = "Allow"
-              Action = [
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:DescribeSecret"
-              ]
-              Resource = aws_secretsmanager_secret.credential_secret.arn
-         }
-         ]
-    })
+  name = "rdsproxy-policy-${var.environment}"
+  role = aws_iam_role.rdsproxy_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ]
+        Resource = [
+          aws_rds_cluster.aurora.master_user_secret[0].secret_arn
+
+        ]
+      }
+    ]
+  })
 }
 
 
@@ -54,13 +57,13 @@ resource "aws_db_proxy" "proxy" {
   # configure authentication for the RDS Proxy to use the credentials stored in Secrets Manager
   auth {
     auth_scheme = "SECRETS" # use Secrets Manager for authentication to securely manage database credentials and avoid hardcoding them in the application code or configuration files
-    description = "Authentication for RDS Proxy using Secrets Manager"
-    iam_auth    = "DISABLED" # disable IAM authentication to use only Secrets Manager for authentication, which is more secure and easier to manage for database credentials
-    secret_arn  = aws_secretsmanager_secret.credential_secret.arn
+    description = "Authentication for RDS Proxy using end to end IAM authentication to access the Aurora cluster "
+    iam_auth    = "REQUIRED" # require IAM authentication for added security and to prevent unauthorized access to the database
+    secret_arn  = aws_rds_cluster.aurora.master_user_secret[0].secret_arn
   }
 
   tags = {
-    Name = "aurora-proxy-${var.environment}"
+    Name        = "aurora-proxy-${var.environment}"
     Environment = var.environment
   }
 }
@@ -80,7 +83,7 @@ resource "aws_db_proxy_default_target_group" "proxy_target_group" {
   lifecycle {
     replace_triggered_by = [aws_db_proxy.proxy.id]
   }
-  
+
 }
 
 # create a target for the RDS Proxy to connect to the Aurora cluster

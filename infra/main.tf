@@ -38,7 +38,6 @@ module "database" {
   private_db_subnet_ids = module.vpc.private_db_subnet_ids
   db_name               = var.db_name
   db_username           = var.db_username
-  db_password           = var.db_password
   aurora_sg_id          = module.security.aurora_sg_id
   rdsproxy_sg_id        = module.security.rdsproxy_sg_id
 }
@@ -72,12 +71,15 @@ module "compute" {
   elasticache_replication_group_endpoint = module.cache.elasticache_replication_group_endpoint
   rds_proxy_endpoint                     = module.database.rds_proxy_endpoint
   db_name                                = var.db_name
-  db_secret_arn                          = module.database.db_secret_arn
+  db_password_secret_arn                 = module.database.db_password_secret_arn
+  rds_proxy_resource_id                  = module.database.rds_proxy_resource_id
   ecr_repository_url                     = module.ecr.ecr_repository_url
   ecr_flyway_repository_url              = module.ecr.ecr_flyway_repository_url
   sqs_queue_url                          = module.notifications.sqs_queue_url
   sqs_queue_arn                          = module.notifications.sqs_queue_arn
-  documents_bucket_name                  = var.documents_bucket_name
+  documents_sqs_queue_url                = module.documents.documents_sqs_queue_url
+  documents_sqs_queue_arn                = module.documents.documents_sqs_queue_arn
+  documents_bucket_name                  = module.storage.documents_bucket_name
   aws_region                             = var.aws_region
 }
 
@@ -111,4 +113,13 @@ module "notifications" {
   environment = var.environment
   aws_region  = var.aws_region
 }
-# trigger
+
+module "documents" {
+  # checkov:skip=CKV_TF_1:Using local paths for a single portfolio project repository layout
+  # checkov:skip=CKV_TF_2:Using local paths for a single portfolio project repository layout
+  source                = "./modules/documents"
+  environment           = var.environment
+  aws_region            = var.aws_region
+  documents_bucket_arn  = module.storage.documents_bucket_arn
+  documents_bucket_name = module.storage.documents_bucket_name
+}

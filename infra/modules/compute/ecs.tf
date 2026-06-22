@@ -33,19 +33,24 @@ resource "aws_ecs_task_definition" "app" {
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
 
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture        = "ARM64"
+  }
+
   # Define volumes for the SSM agent to provide necessary storage for its operation
-      volume  {
-        name = "ssm-lib"
-      }
+  volume {
+    name = "ssm-lib"
+  }
 
-      volume  {
-        name = "ssm-log"
-      }
+  volume {
+    name = "ssm-log"
+  }
 
-      volume  {
-        name = "managed-agents"
-      }
-  
+  volume {
+    name = "managed-agents"
+  }
+
 
   container_definitions = jsonencode([
     {
@@ -87,8 +92,10 @@ resource "aws_ecs_task_definition" "app" {
         { name = "ELASTICACHE_ENDPOINT", value = var.elasticache_replication_group_endpoint },
         { name = "RDS_PROXY_ENDPOINT", value = var.rds_proxy_endpoint },
         { name = "DB_NAME", value = var.db_name },
-        { name = "SQS_QUEUE_URL", value = var.sqs_queue_url },
-        { name = "DB_SECRET_ARN", value = var.db_secret_arn },
+        { name = "DB_USERNAME", value = var.db_iam_username },
+        { name = "NOTIFICATION_SQS_QUEUE_URL", value = var.sqs_queue_url },
+        { name = "DOCUMENTS_SQS_QUEUE_URL", value = var.documents_sqs_queue_url },
+        { name = "DOCUMENTS_BUCKET_NAME", value = var.documents_bucket_name },
         { name = "ENVIRONMENT", value = var.environment },
         { name = "AWS_REGION", value = data.aws_region.current.region }
       ]
@@ -112,6 +119,7 @@ resource "aws_ecs_service" "service" {
   task_definition        = aws_ecs_task_definition.app.arn
   desired_count          = 2 # Set the desired count of tasks to 2 for high availability, but adjust this value based on your application's needs and traffic patterns
   launch_type            = "FARGATE"
+  platform_version       = "LATEST"
   enable_execute_command = true # Enable execute command for remote debugging and management of the tasks, which allows you to run commands in the container without needing to SSH into the underlying EC2 instances, providing a more secure and efficient way to troubleshoot and manage your application tasks
 
   lifecycle {

@@ -67,93 +67,93 @@ resource "aws_wafv2_web_acl" "waf" {
     }
   }
 
-rule {
-  name = "ip-reputation-rule"
-  priority = 3
+  rule {
+    name     = "ip-reputation-rule"
+    priority = 3
 
     override_action {
-        none {}
+      none {}
     }
 
     statement {
-        managed_rule_group_statement {
-            name = "AWSManagedRulesAmazonIpReputationList"
-            vendor_name = "AWS"
-        }
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesAmazonIpReputationList"
+        vendor_name = "AWS"
+      }
     }
 
     visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "ipReputationRule"
-    sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "ipReputationRule"
+      sampled_requests_enabled   = true
+    }
   }
-}
 
-rule {
-  name = "common-rule-set"
-  priority = 4
+  rule {
+    name     = "common-rule-set"
+    priority = 4
 
     override_action {
-        none {}
+      none {}
     }
 
     statement {
-        managed_rule_group_statement {
-            name = "AWSManagedRulesCommonRuleSet"
-            vendor_name = "AWS"
-        }
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+      }
     }
 
     visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "commonRuleSet"
-    sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "commonRuleSet"
+      sampled_requests_enabled   = true
+    }
   }
-}
 
-rule {
-  name = "SQLi-rule-set"
-  priority = 5
+  rule {
+    name     = "SQLi-rule-set"
+    priority = 5
 
     override_action {
-        none {}
+      none {}
     }
 
     statement {
-        managed_rule_group_statement {
-            name = "AWSManagedRulesSQLiRuleSet"
-            vendor_name = "AWS"
-        }
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesSQLiRuleSet"
+        vendor_name = "AWS"
+      }
     }
 
     visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "SQLiRuleSet"
-    sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "SQLiRuleSet"
+      sampled_requests_enabled   = true
+    }
   }
-}
 
-rule {
-  name = "AWSManagedRulesKnownBadInputsRuleSet"
-  priority = 6
+  rule {
+    name     = "AWSManagedRulesKnownBadInputsRuleSet"
+    priority = 6
 
     override_action {
-        none {}
+      none {}
     }
 
     statement {
-        managed_rule_group_statement {
-            name = "AWSManagedRulesKnownBadInputsRuleSet"
-            vendor_name = "AWS"
-        }
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+        vendor_name = "AWS"
+      }
     }
 
     visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "knownBadInputsRuleSet"
-    sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "knownBadInputsRuleSet"
+      sampled_requests_enabled   = true
+    }
   }
-}
 
 
   visibility_config {

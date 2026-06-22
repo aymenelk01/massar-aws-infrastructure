@@ -15,20 +15,21 @@ resource "aws_rds_cluster" "aurora" {
   # checkov:skip=CKV_AWS_327: Portfolio project- using default AWS-managed encryption to maintain $0.00 cost instead of a $1/mo paid custom KMS key
   # checkov:skip=CKV_AWS_326: Portfolio project- uses modern Aurora MySQL v3 (MySQL 8.0). Backtracking is a legacy feature only supported on v2 and is skipped to avoid deployment errors.
   # checkov:skip=CKV2_AWS_8: Portfolio project- relying on native Aurora automated backups it's sufficient for a portfolio project.
-  cluster_identifier              = "aurora-cluster-${var.environment}"
-  engine                          = "aurora-mysql"
-  engine_mode                     = "provisioned"
-  engine_version                  = "8.0.mysql_aurora.3.12.0"
-  database_name                   = var.db_name
-  master_username                 = var.db_username
-  master_password                 = var.db_password
-  storage_encrypted               = true
-  vpc_security_group_ids          = [var.aurora_sg_id]
-  db_subnet_group_name            = aws_db_subnet_group.db_subnet_group.name
-  enabled_cloudwatch_logs_exports = ["audit", "error", "slowquery"]
-  deletion_protection             = false
-  copy_tags_to_snapshot           = false
-  skip_final_snapshot = true # Skip final snapshot to avoid additional costs in a portfolio project, as the database is not critical and can be easily recreated if needed. This is acceptable for a non-production environment where data persistence is not a concern.
+  cluster_identifier                  = "aurora-cluster-${var.environment}"
+  engine                              = "aurora-mysql"
+  engine_mode                         = "provisioned"
+  engine_version                      = "8.0.mysql_aurora.3.12.0"
+  database_name                       = var.db_name
+  master_username                     = var.db_username
+  manage_master_user_password         = true
+  storage_encrypted                   = true
+  vpc_security_group_ids              = [var.aurora_sg_id]
+  db_subnet_group_name                = aws_db_subnet_group.db_subnet_group.name
+  enabled_cloudwatch_logs_exports     = ["audit", "error", "slowquery"]
+  deletion_protection                 = false
+  copy_tags_to_snapshot               = false
+  skip_final_snapshot                 = true # Skip final snapshot to avoid additional costs in a portfolio project, as the database is not critical and can be easily recreated if needed. This is acceptable for a non-production environment where data persistence is not a concern.
+  iam_database_authentication_enabled = true
 
   depends_on = [
     aws_cloudwatch_log_group.aurora_error_logs,

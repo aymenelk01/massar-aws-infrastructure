@@ -10,7 +10,7 @@ resource "aws_s3_bucket_policy" "static_bucket_policy" {
         Principal = {
           Service = "cloudfront.amazonaws.com"
         }
-        Action   = "s3:GetObject"
+        Action = "s3:GetObject"
         Resource = [
           var.static_bucket_arn,
           "${var.static_bucket_arn}/*"

@@ -6,7 +6,12 @@ resource "aws_ecs_task_definition" "flyway" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
-  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  execution_role_arn       = aws_iam_role.flyway_execution_role.arn
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture        = "ARM64"
+  }
+
 
   container_definitions = jsonencode([
     {
@@ -34,11 +39,11 @@ resource "aws_ecs_task_definition" "flyway" {
       secrets = [
         {
           name      = "FLYWAY_USER"
-          valueFrom = "${var.db_secret_arn}:username::"
+          valueFrom = "${var.db_password_secret_arn}:username::"
         },
         {
           name      = "FLYWAY_PASSWORD"
-          valueFrom = "${var.db_secret_arn}:password::"
+          valueFrom = "${var.db_password_secret_arn}:password::"
         }
       ]
 

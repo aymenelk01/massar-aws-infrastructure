@@ -29,6 +29,12 @@ variable "github_branch_name" {
   default     = "main"
 }
 
+variable "service" {
+  description = "The service name for FinOps tagging"
+  type        = string
+  default     = "Massar"
+}
+
 variable "github_username" {
   description = "The GitHub username for the repository (e.g., aymenelk01)"
   type        = string
