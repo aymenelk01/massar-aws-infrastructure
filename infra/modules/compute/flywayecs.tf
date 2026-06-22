@@ -32,7 +32,7 @@ resource "aws_ecs_task_definition" "flyway" {
       environment = [
         {
           name  = "FLYWAY_URL"
-          value = "jdbc:mysql://${var.rds_proxy_endpoint}:3306/${var.db_name}?useSSL=true&requireSSL=true&trustServerCertificate=true" # JDBC URL for connecting to the database through the RDS Proxy, with SSL mode set to REQUIRED for secure communication and trustServerCertificate set to true to allow connections without validating the server's SSL certificate, which is necessary when using self-signed certificates or when the certificate authority is not recognized by the client, but ensure that proper security measures are in place to protect the database credentials and the RDS Proxy endpoint from unauthorized access
+          value = "jdbc:mysql://${var.aurora_cluster_endpoint}:3306/${var.db_name}?useSSL=true&requireSSL=true&trustServerCertificate=true" # JDBC URL for connecting to the database through the Aurora cluster writer endpoint directly, with SSL mode set to REQUIRED for secure communication and trustServerCertificate set to true to allow connections without validating the server's SSL certificate, which is necessary when using self-signed certificates or when the certificate authority is not recognized by the client.
         }
       ]
 
