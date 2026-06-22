@@ -22,6 +22,7 @@ resource "aws_lambda_function" "notifications_lambda" {
   timeout          = var.lambda_timeout
   memory_size      = var.lambda_memory_size
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  architectures    = ["arm64"]
   depends_on       = [aws_cloudwatch_log_group.lambda_log_group]
 
   filename = data.archive_file.lambda_zip.output_path
@@ -32,7 +33,7 @@ resource "aws_lambda_function" "notifications_lambda" {
 
   environment {
     variables = {
-      SNS_TOPIC_ARN = aws_sns_topic.notifications_topic.arn
+      SNS_TOPIC_ARN    = aws_sns_topic.notifications_topic.arn
       SES_SENDER_EMAIL = "aymenelkharchi15@gmail.com"
     }
   }

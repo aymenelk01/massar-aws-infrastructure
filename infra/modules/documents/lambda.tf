@@ -3,10 +3,10 @@
 # 1. THE COMMUNITY MODULE HANDLES ZIP PACKAGING, DEPENDENCIES, LOG GROUPS, AND THE FUNCTION LAYERS
 module "diploma_generator_lambda" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 7.0"
+  version = "~> 8.0"
 
-  # checkov:skip=CKV_TF_1:Using public registry references for portfolio grouping
-  # checkov:skip=CKV_TF_2:Using public registry references for portfolio grouping
+  #checkov:skip=CKV_TF_1:Using public registry references for portfolio grouping
+  #checkov:skip=CKV_TF_2:Using public registry references for portfolio grouping
 
   function_name = "${var.environment}-diploma-generator"
   description   = "Generates Moroccan Baccalaureate diplomas using fpdf2 script layers"
@@ -14,6 +14,8 @@ module "diploma_generator_lambda" {
   runtime       = "python3.12"
   timeout       = var.lambda_timeout
   memory_size   = var.lambda_memory_size
+  architectures = ["arm64"]
+  create_role   = false
 
   # 2. POINT THE MODULE TO YOUR SRC FOLDER AND TURN ON PIP AUTOMATION
   source_path = [
