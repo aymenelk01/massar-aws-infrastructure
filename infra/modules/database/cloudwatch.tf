@@ -2,7 +2,7 @@
 resource "aws_cloudwatch_log_group" "aurora_error_logs" {
   # checkov:skip=CKV_AWS_158:Default AWS managed encryption is sufficient for this portfolio project. Avoids customer-managed KMS key costs.
   # checkov:skip=CKV_AWS_338:Portfolio project optimized for cost insulation. Retaining logs for 1 year exceeds free tier limits.
-  
+
   name = "/aws/rds/cluster/aurora-cluster-${var.environment}/error"
 
   retention_in_days = 7 # the logs will be saved in CloudWatch for 7 days, after which they will be automatically deleted. Adjust this value based on your log retention requirements and compliance policies.
@@ -18,7 +18,7 @@ resource "aws_cloudwatch_log_group" "aurora_error_logs" {
 resource "aws_cloudwatch_log_group" "aurora_slowquery_logs" {
   # checkov:skip=CKV_AWS_158:Default AWS managed encryption is sufficient for this portfolio project. Avoids customer-managed KMS key costs.
   # checkov:skip=CKV_AWS_338:Portfolio project optimized for cost insulation. Retaining logs for 1 year exceeds free tier limits.
-  
+
   name              = "/aws/rds/cluster/aurora-cluster-${var.environment}/slowquery"
   retention_in_days = 7 # the logs will be saved in CloudWatch for 7 days, after which they will be automatically deleted. 
   #Adjust this value based on your log retention requirements and compliance policies.

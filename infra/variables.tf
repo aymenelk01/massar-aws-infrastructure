@@ -47,6 +47,12 @@ variable "logs_bucket_name" {
   type        = string
 }
 
+# variable for the service name
+variable "service" {
+  description = "The service name for FinOps tagging"
+  type        = string
+  default     = "Massar"
+}
 
 /* # uncomment this variable and provide the ARN of the SSL certificate to enable HTTPS for the ALB
 variable "certificate_arn" {

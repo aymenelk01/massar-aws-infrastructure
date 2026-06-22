@@ -11,7 +11,7 @@ resource "aws_ecs_task_definition" "flyway" {
     operating_system_family = "LINUX"
     cpu_architecture        = "ARM64"
   }
-  
+
 
   container_definitions = jsonencode([
     {

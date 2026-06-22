@@ -18,7 +18,7 @@ output "documents_bucket_arn" {
 output "documents_bucket_regional_domain_name" {
   description = "The regional domain name of the S3 bucket for documents"
   value       = aws_s3_bucket.documents_files.bucket_regional_domain_name
-  
+
 }
 
 output "static_bucket_name" {
@@ -39,7 +39,7 @@ output "static_bucket_arn" {
 output "static_bucket_regional_domain_name" {
   description = "The regional domain name of the S3 bucket for static files"
   value       = aws_s3_bucket.static_files.bucket_regional_domain_name
-  
+
 }
 
 output "state_bucket_name" {

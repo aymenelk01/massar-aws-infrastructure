@@ -50,7 +50,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs_lifecycle" {
     id     = "archive-old-logs"
     status = "Enabled"
     filter {} # apply the rule to all objects in the bucket
-   
+
     abort_incomplete_multipart_upload {
       days_after_initiation = 3
     }

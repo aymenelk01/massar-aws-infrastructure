@@ -5,14 +5,14 @@ resource "aws_lb" "alb" {
   # checkov:skip=CKV2_AWS_28: alb already protected by security group who restricts access to only CloudFront prefix list, and cloudfront is protected by AWS WAF 
   # checkov:skip=CKV_AWS_150: Portofolio project — deletion protection not needed
   # checkov:skip=CKV2_AWS_20: No certificate yet, HTTP only — HTTPS is a future improvement
- 
-  name               = "ALB-${var.environment}"
-  internal           = false # set to false to create an internet-facing ALB that can receive traffic from the internet
-  load_balancer_type = "application"
-  security_groups    = [var.alb_sg_id]
-  subnets            = var.public_subnet_ids
+
+  name                       = "ALB-${var.environment}"
+  internal                   = false # set to false to create an internet-facing ALB that can receive traffic from the internet
+  load_balancer_type         = "application"
+  security_groups            = [var.alb_sg_id]
+  subnets                    = var.public_subnet_ids
   enable_deletion_protection = false # set to false to prevent accidental deletion of the ALB, which is a critical component of the infrastructure and should be protected from accidental deletion
-  drop_invalid_header_fields = true # drop invalid header fields to improve security by preventing malicious requests with malformed headers from reaching the targets
+  drop_invalid_header_fields = true  # drop invalid header fields to improve security by preventing malicious requests with malformed headers from reaching the targets
   access_logs {
     bucket  = "${var.environment}-${var.logs_bucket_name}"
     prefix  = "alb-logs"
@@ -37,12 +37,12 @@ resource "aws_lb_target_group" "target" {
 
   health_check {
     enabled             = true
-    path                = "/health"   # specify the path for the health check (e.g., the root path of the application)
-    interval            = 30    # check every 30 seconds
-    timeout             = 5     # consider the target unhealthy if it does not respond within 5 seconds
-    healthy_threshold   = 3     # consider the target healthy after 3 consecutive successful health checks
-    unhealthy_threshold = 2     # consider the target unhealthy after 2 consecutive failed health checks
-    matcher             = "200" # consider the target healthy if it returns a 200 status code
+    path                = "/health" # specify the path for the health check (e.g., the root path of the application)
+    interval            = 30        # check every 30 seconds
+    timeout             = 5         # consider the target unhealthy if it does not respond within 5 seconds
+    healthy_threshold   = 3         # consider the target healthy after 3 consecutive successful health checks
+    unhealthy_threshold = 2         # consider the target unhealthy after 2 consecutive failed health checks
+    matcher             = "200"     # consider the target healthy if it returns a 200 status code
 
   }
 }
@@ -51,7 +51,7 @@ resource "aws_lb_target_group" "target" {
 resource "aws_lb_listener" "frontend" {
   #checkov:skip=CKV_AWS_103: in this portfolio project, we are not using an SSL certificate for the ALB, so we will use HTTP on port 80 for simplicity. In a production environment, you should use HTTPS with a valid SSL certificate to secure the traffic between the clients and the ALB.
   #checkov:skip=CKV_AWS_2: No certificate yet, HTTP only — HTTPS is a future improvement
-  
+
   load_balancer_arn = aws_lb.alb.arn
   port              = 80
   protocol          = "HTTP"
