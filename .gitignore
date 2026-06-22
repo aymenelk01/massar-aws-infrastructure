@@ -15,6 +15,8 @@ crash.*.log
 # Exclude all variable files (They often contain passwords/tokens)
 *.tfvars
 *.tfvars.json
+# Allow infracost.tfvars to be committed
+!infracost.tfvars
 
 # Override files
 override.tf
