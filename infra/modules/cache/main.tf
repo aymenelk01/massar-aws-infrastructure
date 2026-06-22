@@ -18,7 +18,7 @@ resource "aws_elasticache_replication_group" "cache_replication_group" {
   preferred_cache_cluster_azs = var.availability_zones # specify the availability zones for the cache clusters to improve availability and fault tolerance
   replication_group_id        = "massar-cache-${var.environment}"
   description                 = "Massar Cache Replication Group for ${var.environment} environment"
-  node_type                   = "cache.t3.micro" # choose an appropriate node type based on your requirements 
+  node_type                   = "cache.t4g.micro" # choose an appropriate node type based on your requirements 
   num_cache_clusters          = 2 # specify the number of cache clusters in the replication group to improve performance and availability by distributing the load across multiple nodes
   parameter_group_name        = aws_elasticache_parameter_group.custom_redis7.name
   subnet_group_name           = aws_elasticache_subnet_group.cache_subnet_group.name
