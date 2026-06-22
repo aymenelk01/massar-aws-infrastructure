@@ -89,6 +89,15 @@ resource "aws_vpc_security_group_egress_rule" "ecs_to_s3" {
   prefix_list_id    = data.aws_ec2_managed_prefix_list.s3.id
 }
 
+resource "aws_vpc_security_group_egress_rule" "ecs_to_aurora" {
+  security_group_id            = aws_security_group.ecs_sg.id
+  description                  = "Allow outbound database queries directly to the Aurora cluster (e.g. for Flyway migrations)"
+  from_port                    = 3306
+  to_port                      = 3306
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.aurora_sg.id
+}
+
 # ------------------------------------------
 # VPC Endpoints Rule Definitions
 # ------------------------------------------
@@ -144,4 +153,13 @@ resource "aws_vpc_security_group_ingress_rule" "aurora_from_proxy" {
   to_port                      = 3306
   ip_protocol                  = "tcp"
   referenced_security_group_id = aws_security_group.rdsproxy_sg.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "aurora_from_ecs" {
+  security_group_id            = aws_security_group.aurora_sg.id
+  description                  = "Allow inbound database traffic directly from the ECS tier (e.g. for Flyway migrations)"
+  from_port                    = 3306
+  to_port                      = 3306
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.ecs_sg.id
 }
