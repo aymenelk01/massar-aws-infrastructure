@@ -33,6 +33,11 @@ resource "aws_ecs_task_definition" "app" {
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
 
+  runtime_platform {
+    cpu_architecture = "ARM64"
+    operating_system_family = "LINUX"
+  }
+
   # Define volumes for the SSM agent to provide necessary storage for its operation
       volume  {
         name = "ssm-lib"
@@ -112,6 +117,7 @@ resource "aws_ecs_service" "service" {
   task_definition        = aws_ecs_task_definition.app.arn
   desired_count          = 2 # Set the desired count of tasks to 2 for high availability, but adjust this value based on your application's needs and traffic patterns
   launch_type            = "FARGATE"
+  platform_version       = "LATEST"
   enable_execute_command = true # Enable execute command for remote debugging and management of the tasks, which allows you to run commands in the container without needing to SSH into the underlying EC2 instances, providing a more secure and efficient way to troubleshoot and manage your application tasks
 
   lifecycle {
