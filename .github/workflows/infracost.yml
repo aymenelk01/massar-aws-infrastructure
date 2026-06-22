@@ -1,0 +1,59 @@
+name: Infracost
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'infra/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  infracost:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Install and configure the Infracost CLI
+      - name: Setup Infracost
+        uses: infracost/actions/setup@v3
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+
+      # Step 2: Checkout the base branch of the PR to calculate current costs
+      - name: Checkout base branch
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+
+      # Step 3: Generate the baseline cost estimate JSON file
+      - name: Generate Infracost baseline
+        run: |
+          infracost breakdown --path=infra/ \
+            --terraform-var-file=infra/infracost.tfvars \
+            --format=json \
+            --out-file=/tmp/infracost-base.json
+
+      # Step 4: Checkout the current PR branch to calculate proposed changes
+      - name: Checkout PR branch
+        uses: actions/checkout@v5
+
+      # Step 5: Compare PR code against the baseline to generate the diff
+      - name: Generate Infracost diff
+        run: |
+          infracost diff --path=infra/ \
+            --terraform-var-file=infra/infracost.tfvars \
+            --format=json \
+            --compare-to=/tmp/infracost-base.json \
+            --out-file=/tmp/infracost.json
+
+      # Step 6: Post or update the cost impact comment on the GitHub Pull Request
+      - name: Post Infracost comment
+        run: |
+          infracost comment github \
+            --path=/tmp/infracost.json \
+            --repo=$GITHUB_REPOSITORY \
+            --github-token=${{ github.token }} \
+            --pull-request=${{ github.event.pull_request.number }} \
+            --behavior=update
