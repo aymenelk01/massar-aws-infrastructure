@@ -3,8 +3,7 @@ resource "aws_db_subnet_group" "db_subnet_group" {
   name       = "db-subnet-group-${var.environment}"
   subnet_ids = var.private_db_subnet_ids
   tags = {
-    Name        = "DBSubnetGroup-${var.environment}"
-    Environment = var.environment
+    Name = "DBSubnetGroup-${var.environment}"
   }
 }
 
@@ -20,8 +19,7 @@ resource "aws_rds_cluster_parameter_group" "aurora" {
   }
 
   tags = {
-    Name        = "${var.environment}-aurora-parameter-group"
-    Environment = var.environment
+    Name = "${var.environment}-aurora-parameter-group"
   }
 }
 
@@ -61,8 +59,7 @@ resource "aws_rds_cluster" "aurora" {
   }
 
   tags = {
-    Name        = "AuroraCluster-${var.environment}"
-    Environment = var.environment
+    Name = "AuroraCluster-${var.environment}"
   }
 }
 
@@ -78,8 +75,7 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
   auto_minor_version_upgrade = true # Enable automatic minor version upgrades to ensure the database instance receives important security patches and updates without manual intervention, which is suitable for a portfolio project and helps maintain security without additional operational overhead.
 
   tags = {
-    Name        = "AuroraInstance-${var.environment}"
-    Environment = var.environment
+    Name = "AuroraInstance-${var.environment}"
   }
 }
 
