@@ -1,4 +1,5 @@
 # RDS Proxy configuration to optimize database connections and improve performance for the Aurora cluster
+
 resource "aws_iam_role" "rdsproxy_role" {
   name = "rdsproxy-role-${var.environment}"
 
@@ -17,9 +18,7 @@ resource "aws_iam_role" "rdsproxy_role" {
 
   tags = {
     Name        = "RDSProxyRole-${var.environment}"
-    Environment = var.environment
   }
-
 }
 
 resource "aws_iam_role_policy" "rdsproxy_policy" {
@@ -31,18 +30,15 @@ resource "aws_iam_role_policy" "rdsproxy_policy" {
       {
         Effect = "Allow"
         Action = [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret"
+          "rds-db:connect"
         ]
         Resource = [
-          aws_rds_cluster.aurora.master_user_secret[0].secret_arn
-
+          "arn:aws:rds-db:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:dbuser:${aws_rds_cluster.aurora.cluster_resource_id}/db_iam_user"
         ]
       }
     ]
   })
 }
-
 
 resource "aws_db_proxy" "proxy" {
   name                   = "aurora-proxy-${var.environment}"
@@ -54,20 +50,13 @@ resource "aws_db_proxy" "proxy" {
   vpc_security_group_ids = [var.rdsproxy_sg_id]
   vpc_subnet_ids         = var.private_db_subnet_ids
 
-  # configure authentication for the RDS Proxy to use the credentials stored in Secrets Manager
-  auth {
-    auth_scheme = "SECRETS" # use Secrets Manager for authentication to securely manage database credentials and avoid hardcoding them in the application code or configuration files
-    description = "Authentication for RDS Proxy using end to end IAM authentication to access the Aurora cluster "
-    iam_auth    = "REQUIRED" # require IAM authentication for added security and to prevent unauthorized access to the database
-    secret_arn  = aws_rds_cluster.aurora.master_user_secret[0].secret_arn
-  }
+  # Configure the proxy to use end-to-end IAM database authentication, bypassing Secrets Manager entirely for client database connections.
+  default_auth_scheme = "IAM_AUTH"
 
   tags = {
     Name        = "aurora-proxy-${var.environment}"
-    Environment = var.environment
   }
 }
-
 
 # Create a default target group for the RDS Proxy with connection pool configuration to optimize database connections and improve performance
 resource "aws_db_proxy_default_target_group" "proxy_target_group" {
@@ -83,7 +72,6 @@ resource "aws_db_proxy_default_target_group" "proxy_target_group" {
   lifecycle {
     replace_triggered_by = [aws_db_proxy.proxy.id]
   }
-
 }
 
 # create a target for the RDS Proxy to connect to the Aurora cluster
@@ -92,4 +80,3 @@ resource "aws_db_proxy_target" "proxy_target" {
   target_group_name     = aws_db_proxy_default_target_group.proxy_target_group.name
   db_cluster_identifier = aws_rds_cluster.aurora.cluster_identifier
 }
-
