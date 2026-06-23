@@ -15,7 +15,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Environment = var.environment
+      Environment = var.environment == "dev" ? "Dev" : (var.environment == "staging" ? "Stage" : (var.environment == "prod" ? "Prod" : var.environment))
       Project     = "Massar"
       ManagedBy   = "Terraform"
       Service     = var.service
@@ -30,7 +30,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Environment = var.environment
+      Environment = var.environment == "dev" ? "Dev" : (var.environment == "staging" ? "Stage" : (var.environment == "prod" ? "Prod" : var.environment))
       Project     = "Massar"
       ManagedBy   = "Terraform"
       Service     = var.service
