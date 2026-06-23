@@ -132,8 +132,10 @@ def lambda_handler(event, context):
                 logger.info(f"Diploma already exists for {code_massar} at {s3_key}. Skipping generation.")
                 continue
             except ClientError as e:
-                if e.response["Error"]["Code"] == "404":
-                    pass # Not found, proceed with generation
+                error_code = e.response.get("Error", {}).get("Code", "Unknown")
+                status_code = e.response.get("ResponseMetadata", {}).get("HTTPStatusCode", 0)
+                if error_code in ["404", "NoSuchKey", "403", "AccessDenied", "Forbidden"] or status_code in [404, 403]:
+                    pass # Not found or forbidden, proceed with generation
                 else:
                     logger.error(f"Error checking S3 for {code_massar}: {e}")
                     raise e
