@@ -33,7 +33,7 @@ resource "aws_iam_role_policy" "rdsproxy_policy" {
           "rds-db:connect"
         ]
         Resource = [
-          "arn:aws:rds-db:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:dbuser:${aws_rds_cluster.aurora.cluster_resource_id}/db_iam_user"
+          "arn:aws:rds-db:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:dbuser:${aws_rds_cluster.aurora.cluster_resource_id}/db_iam_user"
         ]
       }
     ]

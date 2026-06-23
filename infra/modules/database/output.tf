@@ -4,7 +4,7 @@ output "rds_proxy_endpoint" {
 }
 
 output "rds_proxy_resource_id" {
-  value       = aws_db_proxy.proxy.resource_id
+  value       = last(split(":", aws_db_proxy.proxy.arn))
   description = "The resource ID of the RDS Proxy (prx-XXXX format, used in rds-db:connect IAM ARNs)"
 }
 
