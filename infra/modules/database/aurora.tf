@@ -8,6 +8,23 @@ resource "aws_db_subnet_group" "db_subnet_group" {
   }
 }
 
+resource "aws_rds_cluster_parameter_group" "aurora" {
+  name        = "${var.environment}-aurora-ssl-params"
+  family      = "aurora-mysql8.0"
+  description = "Cluster parameter group to strictly enforce TLS/SSL secure transport"
+
+  # Enforce encrypted connections on the engine level
+  parameter {
+    name  = "require_secure_transport"
+    value = "ON"
+  }
+
+  tags = {
+    Name        = "${var.environment}-aurora-parameter-group"
+    Environment = var.environment
+  }
+}
+
 resource "aws_rds_cluster" "aurora" {
   # checkov:skip=CKV_AWS_162: Portfolio project- iam auth defferred - documented in README as a future enhancement and not critical for a portfolio project.
   # checkov:skip=CKV_AWS_139: Portfolio project- deletion protection set to false because it's a non-production environment and allows for easier cleanup without manual intervention.
@@ -30,6 +47,7 @@ resource "aws_rds_cluster" "aurora" {
   copy_tags_to_snapshot               = false
   skip_final_snapshot                 = true # Skip final snapshot to avoid additional costs in a portfolio project, as the database is not critical and can be easily recreated if needed. This is acceptable for a non-production environment where data persistence is not a concern.
   iam_database_authentication_enabled = true
+  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.aurora.name
 
   depends_on = [
     aws_cloudwatch_log_group.aurora_error_logs,
@@ -64,3 +82,4 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
     Environment = var.environment
   }
 }
+
