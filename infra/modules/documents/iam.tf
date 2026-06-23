@@ -52,7 +52,15 @@ resource "aws_iam_role_policy" "lambda_policy" {
       {
         Effect = "Allow"
         Action = [
+          "s3:ListBucket"
+        ]
+        Resource = var.documents_bucket_arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "s3:PutObject",
+          "s3:GetObject"
         ]
         Resource = "${var.documents_bucket_arn}/diplomas/*"
       }
