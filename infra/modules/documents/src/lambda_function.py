@@ -3,6 +3,7 @@ import json
 import boto3
 import logging
 from fpdf import FPDF
+from botocore.exceptions import ClientError
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -122,11 +123,24 @@ def lambda_handler(event, context):
                 logger.info(f"Skipping diploma generation for student {code_massar} - Status is '{result}'")
                 continue
             
+            # Upload PDF bytearray directly to the private S3 documents bucket
+            s3_key = f"diplomas/{code_massar}_bac_diploma.pdf"
+            
+            # Check if diploma already exists in S3
+            try:
+                s3_client.head_object(Bucket=BUCKET_NAME, Key=s3_key)
+                logger.info(f"Diploma already exists for {code_massar} at {s3_key}. Skipping generation.")
+                continue
+            except ClientError as e:
+                if e.response["Error"]["Code"] == "404":
+                    pass # Not found, proceed with generation
+                else:
+                    logger.error(f"Error checking S3 for {code_massar}: {e}")
+                    raise e
+
             # Generate the PDF bytearray
             pdf_bytes = generate_diploma(student)
             
-            # Upload PDF bytearray directly to the private S3 documents bucket
-            s3_key = f"diplomas/{code_massar}_bac_diploma.pdf"
             logger.info(f"Uploading diploma for {code_massar} to S3 bucket '{BUCKET_NAME}'...")
             
             s3_client.put_object(
