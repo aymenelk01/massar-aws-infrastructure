@@ -4,8 +4,8 @@ output "rds_proxy_endpoint" {
 }
 
 output "rds_proxy_resource_id" {
-  value       = aws_db_proxy.proxy.id
-  description = "The resource ID of the RDS Proxy"
+  value       = aws_db_proxy.proxy.resource_id
+  description = "The resource ID of the RDS Proxy (prx-XXXX format, used in rds-db:connect IAM ARNs)"
 }
 
 output "aurora_cluster_endpoint" {
