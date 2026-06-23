@@ -37,6 +37,12 @@ variable "rds_proxy_endpoint" {
   description = "The endpoint of the RDS Proxy"
   type        = string
 }
+
+variable "aurora_cluster_endpoint" {
+  description = "The endpoint of the Aurora cluster"
+  type        = string
+}
+
 variable "db_name" {
   description = "The name of the database"
   type        = string

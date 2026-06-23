@@ -3,8 +3,23 @@ resource "aws_db_subnet_group" "db_subnet_group" {
   name       = "db-subnet-group-${var.environment}"
   subnet_ids = var.private_db_subnet_ids
   tags = {
-    Name        = "DBSubnetGroup-${var.environment}"
-    Environment = var.environment
+    Name = "DBSubnetGroup-${var.environment}"
+  }
+}
+
+resource "aws_rds_cluster_parameter_group" "aurora" {
+  name        = "${var.environment}-aurora-ssl-params"
+  family      = "aurora-mysql8.0"
+  description = "Cluster parameter group to strictly enforce TLS/SSL secure transport"
+
+  # Enforce encrypted connections on the engine level
+  parameter {
+    name  = "require_secure_transport"
+    value = "ON"
+  }
+
+  tags = {
+    Name = "${var.environment}-aurora-parameter-group"
   }
 }
 
@@ -30,6 +45,7 @@ resource "aws_rds_cluster" "aurora" {
   copy_tags_to_snapshot               = false
   skip_final_snapshot                 = true # Skip final snapshot to avoid additional costs in a portfolio project, as the database is not critical and can be easily recreated if needed. This is acceptable for a non-production environment where data persistence is not a concern.
   iam_database_authentication_enabled = true
+  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.aurora.name
 
   depends_on = [
     aws_cloudwatch_log_group.aurora_error_logs,
@@ -43,8 +59,7 @@ resource "aws_rds_cluster" "aurora" {
   }
 
   tags = {
-    Name        = "AuroraCluster-${var.environment}"
-    Environment = var.environment
+    Name = "AuroraCluster-${var.environment}"
   }
 }
 
@@ -60,7 +75,7 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
   auto_minor_version_upgrade = true # Enable automatic minor version upgrades to ensure the database instance receives important security patches and updates without manual intervention, which is suitable for a portfolio project and helps maintain security without additional operational overhead.
 
   tags = {
-    Name        = "AuroraInstance-${var.environment}"
-    Environment = var.environment
+    Name = "AuroraInstance-${var.environment}"
   }
 }
+
