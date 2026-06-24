@@ -44,6 +44,7 @@ variable "vpc_endpoint_services" {
     "ssmmessages",
     "cognito-idp",
     "secretsmanager",
-    "sqs"
+    "sqs",
+    "bedrock-runtime"
   ]
 }
