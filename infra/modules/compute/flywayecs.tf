@@ -29,18 +29,11 @@ resource "aws_ecs_task_definition" "flyway" {
         ]
       }
 
+      # Enforcing full TLS/SSL parameters directly within the JDBC URL to comply with Aurora secure transport requirements
       environment = [
         {
           name  = "FLYWAY_URL"
-          value = "jdbc:mysql://${var.aurora_cluster_endpoint}:3306/${var.db_name}?permitMysqlScheme=true"
-        },
-        {
-          name  = "FLYWAY_JDBC_PROPERTIES_sslMode"
-          value = "VERIFY_CA"
-        },
-        {
-          name  = "FLYWAY_JDBC_PROPERTIES_serverSslCert"
-          value = "/flyway/rds-ca.pem"
+          value = "jdbc:mysql://${var.aurora_cluster_endpoint}:3306/${var.db_name}?sslMode=verify-ca&serverSslCert=/flyway/rds-ca.pem&permitMysqlScheme=true"
         }
       ]
       secrets = [
