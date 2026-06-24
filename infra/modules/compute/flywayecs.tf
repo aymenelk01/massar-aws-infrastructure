@@ -33,7 +33,7 @@ resource "aws_ecs_task_definition" "flyway" {
       environment = [
         {
           name  = "FLYWAY_URL"
-          value = "jdbc:mysql://${var.aurora_cluster_endpoint}:3306/${var.db_name}?permitMysqlScheme=true&sslMode=VERIFY_CA&serverSslCert=/flyway/rds-ca.pem"
+          value = "jdbc:mariadb://${var.aurora_cluster_endpoint}:3306/${var.db_name}?sslMode=trust"
         }
       ]
       secrets = [
