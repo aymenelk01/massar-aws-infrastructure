@@ -33,6 +33,14 @@ resource "aws_ecs_task_definition" "flyway" {
         {
           name  = "FLYWAY_URL"
           value = "jdbc:mysql://${var.aurora_cluster_endpoint}:3306/${var.db_name}?permitMysqlScheme=true"
+        },
+        {
+          name  = "FLYWAY_JDBC_PROPERTIES_sslMode"
+          value = "VERIFY_CA"
+        },
+        {
+          name  = "FLYWAY_JDBC_PROPERTIES_serverSslCert"
+          value = "/flyway/rds-ca.pem"
         }
       ]
       secrets = [
