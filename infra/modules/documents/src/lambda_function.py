@@ -74,17 +74,20 @@ def generate_diploma(student):
     pdf.set_text_color(70, 70, 70)
     pdf.cell(0, 6, f"Identifiant Unique (Code Massar) : {student['code_massar']}", align="C", new_x="LMARGIN", new_y="NEXT")
     
+    branch = student.get("branch", "Sciences Physiques")
+    pdf.cell(0, 6, f"Série : {branch}", align="C", new_x="LMARGIN", new_y="NEXT")
+    
     # Average and Mention calculation
     average = float(student.get("average", 10.00))
     mention = calculate_mention(average)
     
-    pdf.set_y(114)
+    pdf.set_y(120)
     pdf.set_font("helvetica", "B", 13)
     pdf.set_text_color(26, 107, 60) # Green
     pdf.cell(0, 8, f"Moyenne Générale : {average:.2f}/20    |    Mention : {mention}", align="C", new_x="LMARGIN", new_y="NEXT")
     
     # ── Footnote / Verification ──────────────────────────────────
-    pdf.set_y(140)
+    pdf.set_y(144)
     pdf.set_font("times", "I", 11)
     pdf.set_text_color(110, 110, 110)
     pdf.cell(0, 6, "Ce diplôme électronique est signé numériquement et stocké de manière sécurisée sur la plateforme Massar.", align="C", new_x="LMARGIN", new_y="NEXT")
