@@ -194,7 +194,14 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
         Resource = [
           "arn:aws:rds-db:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:dbuser:${var.rds_proxy_resource_id}/db_iam_user"
         ]
+      },
+      {
+        Sid    = "BedrockInvokeNovaProGuidance"
+        Effect = "Allow"
+        Action = ["bedrock:InvokeModel"]
+        Resource = "arn:aws:bedrock:::foundation-model/amazon.nova-pro-v1:0"
       }
+
     ]
   })
 }
