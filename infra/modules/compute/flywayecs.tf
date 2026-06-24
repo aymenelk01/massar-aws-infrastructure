@@ -32,10 +32,9 @@ resource "aws_ecs_task_definition" "flyway" {
       environment = [
         {
           name  = "FLYWAY_URL"
-          value = "jdbc:mysql://${var.aurora_cluster_endpoint}:3306/${var.db_name}?sslMode=VERIFY_CA" # JDBC URL for connecting to the database through the Aurora cluster writer endpoint directly, with SSL mode set to VERIFY_CA to secure communication by validating the server's SSL certificate against the trusted AWS RDS CA bundle baked into the container's Java truststore.
+          value = "jdbc:mysql://${var.aurora_cluster_endpoint}:3306/${var.db_name}?permitMysqlScheme=true"
         }
       ]
-
       secrets = [
         {
           name      = "FLYWAY_USER"
