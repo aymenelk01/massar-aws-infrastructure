@@ -15,7 +15,7 @@ resource "aws_rds_cluster_parameter_group" "aurora" {
   # Enforce encrypted connections on the engine level
   parameter {
     name  = "require_secure_transport"
-    value = "ON"
+    value = "OFF"
   }
 
   tags = {
