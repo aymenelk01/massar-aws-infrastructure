@@ -199,7 +199,11 @@ resource "aws_iam_role_policy" "ecs_task_policy" {
         Sid    = "BedrockInvokeNovaProGuidance"
         Effect = "Allow"
         Action = ["bedrock:InvokeModel"]
-        Resource = "arn:aws:bedrock:::foundation-model/amazon.nova-pro-v1:0"
+        Resource = [
+          "arn:aws:bedrock:${data.aws_region.current.region}::foundation-model/amazon.nova-pro-v1:0",
+          "arn:aws:bedrock:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:inference-profile/eu.amazon.nova-pro-v1:0",
+          "arn:aws:bedrock:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:inference-profile/us.amazon.nova-pro-v1:0"
+        ]
       }
 
     ]
