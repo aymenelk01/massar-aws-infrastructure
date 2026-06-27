@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_role" {
-  name = "${var.environment}-diploma-generator-lambda-role"
+  name = "massar-${var.environment}-diploma-generator-lambda-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -15,14 +15,14 @@ resource "aws_iam_role" "lambda_role" {
   })
 
   tags = {
-    Name        = "${var.environment}-diploma-generator-lambda-role"
+    Name        = "massar-${var.environment}-diploma-generator-lambda-role"
     Environment = var.environment
     Module      = "documents"
   }
 }
 
 resource "aws_iam_role_policy" "lambda_policy" {
-  name = "${var.environment}-diploma-generator-lambda-policy"
+  name = "massar-${var.environment}-diploma-generator-lambda-policy"
   role = aws_iam_role.lambda_role.id
 
   policy = jsonencode({
