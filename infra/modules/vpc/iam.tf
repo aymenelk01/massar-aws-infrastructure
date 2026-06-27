@@ -1,5 +1,5 @@
 resource "aws_iam_role" "vpcflow_role" {
-  name = "${var.environment}-vpc-flow-role"
+  name = "massar-${var.environment}-vpc-flow-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -15,7 +15,7 @@ resource "aws_iam_role" "vpcflow_role" {
   })
 
   tags = {
-    Name        = "${var.environment}-vpc-flow-role"
+    Name        = "massar-${var.environment}-vpc-flow-role"
     Environment = var.environment
     Module      = "vpc"
   }
@@ -23,7 +23,7 @@ resource "aws_iam_role" "vpcflow_role" {
 
 
 resource "aws_iam_role_policy" "vpcflow_policy" {
-  name = "${var.environment}-vpc-flow-policy"
+  name = "massar-${var.environment}-vpc-flow-policy"
   role = aws_iam_role.vpcflow_role.id
 
   policy = jsonencode({
