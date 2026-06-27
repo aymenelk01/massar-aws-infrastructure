@@ -64,7 +64,7 @@ resource "aws_rds_cluster" "aurora" {
 }
 
 # Create a RDS instance for the Aurora cluster, using the serverless v2 configuration for on-demand scaling based on workload demands
-resource "aws_rds_cluster_instance" "aurora_instance" {
+resource "aws_rds_cluster_instance" "aurora_writer" {
   # checkov:skip=CKV_AWS_118: Portfolio project- Enhanced monitoring is disabled to insulate the portfolio project from operational metrics fees.
   # checkov:skip=CKV_AWS_353: Portfolio project- Performance insights are bypassed to avoid additional costs, which is acceptable for a portfolio project.
   cluster_identifier         = aws_rds_cluster.aurora.cluster_identifier
@@ -79,3 +79,19 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
   }
 }
 
+# Static reader — required baseline for Aurora Auto Scaling
+resource "aws_rds_cluster_instance" "aurora_reader" {
+  # checkov:skip=CKV_AWS_118: Portfolio project- Enhanced monitoring disabled to avoid operational metrics fees.
+  # checkov:skip=CKV_AWS_353: Portfolio project- Performance insights bypassed to avoid additional costs.
+  cluster_identifier         = aws_rds_cluster.aurora.cluster_identifier
+  identifier                 = "aurora-reader-${var.environment}"
+  instance_class             = "db.serverless"
+  engine                     = aws_rds_cluster.aurora.engine
+  engine_version             = aws_rds_cluster.aurora.engine_version
+  auto_minor_version_upgrade = true
+  promotion_tier             = 1 # Set the promotion tier to 1 to prioritize this reader instance for promotion to primary in case of failover, ensuring high availability and minimizing downtime for the Aurora cluster. This is important for maintaining application availability and performance during failover events.
+
+  tags = {
+    Name = "AuroraReader-${var.environment}"
+  }
+}
