@@ -120,9 +120,9 @@ resource "aws_iam_role_policy" "deploy_custom_policy" {
           "iam:PassRole"
         ]
         Resource = [
-          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ecsRole-${var.environment}",
-          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ecsTaskRole-${var.environment}",
-          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/flywayExecutionRole-${var.environment}"
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/massar-ecsRole-${var.environment}",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/massar-ecsTaskRole-${var.environment}",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/massar-flywayExecutionRole-${var.environment}"
         ]
       },
 
