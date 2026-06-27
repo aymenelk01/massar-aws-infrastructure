@@ -1,7 +1,7 @@
 # RDS Proxy configuration to optimize database connections and improve performance for the Aurora cluster
 
 resource "aws_iam_role" "rdsproxy_role" {
-  name = "rdsproxy-role-${var.environment}"
+  name = "massar-rdsproxy-role-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -17,12 +17,12 @@ resource "aws_iam_role" "rdsproxy_role" {
   })
 
   tags = {
-    Name        = "RDSProxyRole-${var.environment}"
+    Name = "massar-RDSProxyRole-${var.environment}"
   }
 }
 
 resource "aws_iam_role_policy" "rdsproxy_policy" {
-  name = "rdsproxy-policy-${var.environment}"
+  name = "massar-rdsproxy-policy-${var.environment}"
   role = aws_iam_role.rdsproxy_role.id
   policy = jsonencode({
     Version = "2012-10-17"
@@ -40,7 +40,7 @@ resource "aws_iam_role_policy" "rdsproxy_policy" {
   })
 }
 
-resource "aws_db_proxy" "proxy" {
+resource "aws_db_proxy" "writer" {
   name                   = "aurora-proxy-${var.environment}"
   debug_logging          = false # enable debug logging for troubleshooting, but disable it in production for better performance and security and to avoid unnecessary costs
   engine_family          = "MYSQL"
@@ -54,13 +54,26 @@ resource "aws_db_proxy" "proxy" {
   default_auth_scheme = "IAM_AUTH"
 
   tags = {
-    Name        = "aurora-proxy-${var.environment}"
+    Name = "aurora-proxy-${var.environment}"
+  }
+}
+
+# Create a read-only endpoint for the RDS Proxy to distribute read queries across multiple Aurora reader instances, improving performance and scalability for read-heavy workloads
+resource "aws_db_proxy_endpoint" "reader" {
+  db_proxy_name          = aws_db_proxy.writer.name
+  db_proxy_endpoint_name = "aurora-proxy-reader-${var.environment}"
+  vpc_subnet_ids         = var.private_db_subnet_ids
+  vpc_security_group_ids = [var.rdsproxy_sg_id]
+  target_role            = "READ_ONLY"
+
+  tags = {
+    Name = "aurora-proxy-reader-${var.environment}"
   }
 }
 
 # Create a default target group for the RDS Proxy with connection pool configuration to optimize database connections and improve performance
 resource "aws_db_proxy_default_target_group" "proxy_target_group" {
-  db_proxy_name = aws_db_proxy.proxy.name
+  db_proxy_name = aws_db_proxy.writer.name
 
   connection_pool_config {
     connection_borrow_timeout    = 120
@@ -70,13 +83,13 @@ resource "aws_db_proxy_default_target_group" "proxy_target_group" {
   }
 
   lifecycle {
-    replace_triggered_by = [aws_db_proxy.proxy.id]
+    replace_triggered_by = [aws_db_proxy.writer.id]
   }
 }
 
 # create a target for the RDS Proxy to connect to the Aurora cluster
 resource "aws_db_proxy_target" "proxy_target" {
-  db_proxy_name         = aws_db_proxy.proxy.name
+  db_proxy_name         = aws_db_proxy.writer.name
   target_group_name     = aws_db_proxy_default_target_group.proxy_target_group.name
   db_cluster_identifier = aws_rds_cluster.aurora.cluster_identifier
 }
