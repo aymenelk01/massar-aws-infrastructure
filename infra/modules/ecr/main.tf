@@ -3,6 +3,7 @@ resource "aws_ecr_repository" "massar_repo" {
   # checkov:skip=CKV_AWS_51: Tag immutability disabled by design — pipeline pushes both SHA and latest tags. SHA tags provide rollback capability and he requires mutability, while latest tags are used for ease of development and testing, and the lifecycle policy will manage old images to control costs.
   name                 = "ecr-repository-${var.environment}"
   image_tag_mutability = "MUTABLE"
+  force_delete = true # since this is a portfolio project, we can allow force deletion of the repository to avoid manual cleanup and reduce operational overhead, as the repository is not critical and can be easily recreated if needed.
 
   image_scanning_configuration {
     scan_on_push = true
@@ -21,6 +22,7 @@ resource "aws_ecr_repository" "massar_repo" {
 # create a lifecycle policy for the ECR repository to automatically clean up old images and manage storage costs, while keeping recent images for rollback safety
 resource "aws_ecr_lifecycle_policy" "cleanup_policy" {
   repository = aws_ecr_repository.massar_repo.name
+  
 
 
   policy = <<EOF
@@ -63,6 +65,7 @@ resource "aws_ecr_repository" "flyway_repo" {
   # checkov:skip=CKV_AWS_51: Tag immutability disabled by design — pipeline pushes both SHA and latest tags. SHA tags provide rollback capability and he requires mutability, while latest tags are used for ease of development and testing, and the lifecycle policy will manage old images to control costs.
   name                 = "flyway-repository-${var.environment}"
   image_tag_mutability = "MUTABLE"
+  force_delete = true # since this is a portfolio project, we can allow force deletion of the repository to avoid manual cleanup and reduce operational overhead, as the repository is not critical and can be easily recreated if needed.
 
   image_scanning_configuration {
     scan_on_push = true
