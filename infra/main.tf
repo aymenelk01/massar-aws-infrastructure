@@ -69,8 +69,9 @@ module "compute" {
   user_pool_id                           = module.cognito.user_pool_id
   user_pool_client_id                    = module.cognito.user_pool_client_id
   elasticache_replication_group_endpoint = module.cache.elasticache_replication_group_endpoint
-  rds_proxy_endpoint                     = module.database.rds_proxy_endpoint
-  aurora_cluster_endpoint                = module.database.aurora_cluster_endpoint
+  rds_proxy_writer_endpoint              = module.database.rds_proxy_writer_endpoint
+  rds_proxy_reader_endpoint              = module.database.rds_proxy_reader_endpoint
+  aurora_cluster_endpoint                = module.database.aurora_writer_endpoint
   db_name                                = var.db_name
   db_password_secret_arn                 = module.database.db_password_secret_arn
   rds_proxy_resource_id                  = module.database.rds_proxy_resource_id
@@ -89,9 +90,7 @@ module "storage" {
   environment           = var.environment
   documents_bucket_name = var.documents_bucket_name
   static_bucket_name    = var.static_bucket_name
-  state_bucket_name     = var.state_bucket_name
   logs_bucket_name      = var.logs_bucket_name
-
 }
 
 module "cloudfront" {

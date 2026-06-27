@@ -60,25 +60,25 @@ output "target_group_arn" {
 
 
 # Database outputs
-output "aurora_cluster_endpoint" {
-  description = "The endpoint of the Aurora cluster"
-  value       = module.database.aurora_cluster_endpoint
+output "aurora_writer_endpoint" {
+  description = "The endpoint of the Aurora writer instance"
+  value       = module.database.aurora_writer_endpoint
 }
 
-output "rds_proxy_endpoint" {
-  description = "The endpoint of the RDS Proxy"
-  value       = module.database.rds_proxy_endpoint
+output "rds_proxy_writer_endpoint" {
+  description = "The endpoint of the RDS Proxy writer"
+  value       = module.database.rds_proxy_writer_endpoint
+}
+
+output "rds_proxy_reader_endpoint" {
+  description = "The endpoint of the RDS Proxy reader"
+  value       = module.database.rds_proxy_reader_endpoint
 }
 
 # Storage outputs 
 output "documents_bucket_name" {
   description = "The name of the S3 bucket for documents files"
   value       = module.storage.documents_bucket_name
-}
-
-output "state_bucket_name" {
-  description = "The name of the S3 bucket for state files"
-  value       = module.storage.state_bucket_name
 }
 
 output "logs_bucket_name" {
