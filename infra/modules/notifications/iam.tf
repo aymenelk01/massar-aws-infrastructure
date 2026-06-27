@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_role" {
-  name = "${var.environment}-notifications-lambda-role"
+  name = "massar-${var.environment}-notifications-lambda-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -15,7 +15,7 @@ resource "aws_iam_role" "lambda_role" {
   })
 
   tags = {
-    Name        = "${var.environment}-notifications-lambda-role"
+    Name        = "massar-${var.environment}-notifications-lambda-role"
     Environment = var.environment
     Module      = "notifications"
   }
@@ -24,7 +24,7 @@ resource "aws_iam_role" "lambda_role" {
 resource "aws_iam_role_policy" "lambda_policy" {
   #checkov:skip=CKV_AWS_355:sns:Publish requires Resource = "*" for direct SMS publishing to phone numbers — AWS does not support resource-level restrictions for this operation
   #checkov:skip=CKV_AWS_290:sns:Publish requires Resource = "*" for direct SMS publishing to phone numbers — AWS does not support resource-level restrictions for this operation
-  name = "${var.environment}-notifications-lambda-policy"
+  name = "massar-${var.environment}-notifications-lambda-policy"
   role = aws_iam_role.lambda_role.id
 
   policy = jsonencode({

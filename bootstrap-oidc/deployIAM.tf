@@ -27,7 +27,7 @@ resource "aws_iam_role" "deploy_role" {
 
   tags = {
     Name        = "${var.oidc_deploy_role_name}-${var.environment}"
-    environment = var.environment
+    Environment = var.environment
   }
 }
 

@@ -1,15 +1,20 @@
-output "rds_proxy_endpoint" {
+output "rds_proxy_writer_endpoint" {
   description = "The endpoint of the RDS proxy"
-  value       = aws_db_proxy.proxy.endpoint
+  value       = aws_db_proxy.writer.endpoint
+}
+
+output "rds_proxy_reader_endpoint" {
+  description = "RDS Proxy read-only endpoint — routes to Aurora reader instances"
+  value       = aws_db_proxy_endpoint.reader.endpoint
 }
 
 output "rds_proxy_resource_id" {
-  value       = element(split(":", aws_db_proxy.proxy.arn), 6)
+  value       = element(split(":", aws_db_proxy.writer.arn), 6)
   description = "The resource ID of the RDS Proxy (prx-XXXX format, used in rds-db:connect IAM ARNs)"
 }
 
-output "aurora_cluster_endpoint" {
-  description = "The endpoint of the Aurora cluster"
+output "aurora_writer_endpoint" {
+  description = "The endpoint of the Aurora writer instance"
   value       = aws_rds_cluster.aurora.endpoint
 }
 

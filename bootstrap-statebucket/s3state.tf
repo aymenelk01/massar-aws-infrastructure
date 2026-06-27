@@ -6,7 +6,8 @@ resource "aws_s3_bucket" "state_files" {
   #checkov:skip=CKV_AWS_145: Portfolio project- AWS default encryption is sufficient for a portfolio project, so using the default AWS-managed encryption to avoid additional costs from a custom KMS key.
   #checkov:skip=CKV2_AWS_62:S3 event notifications not required — no application logic depends on reacting to S3 object events
 
-  bucket = "${var.environment}-${var.state_bucket_name}"
+  bucket = "${var.state_bucket_name}"
+  force_destroy = true # since this is a portfolio project, we can allow force deletion of the bucket to avoid manual cleanup and reduce operational overhead, not recommended for production environments where state files are critical for disaster recovery and rollback, but acceptable for a non-production environment where state files can be easily recreated if needed.
 
   lifecycle {
     prevent_destroy = false # set to true to prevent accidental deletion of the bucket
@@ -43,11 +44,4 @@ resource "aws_s3_bucket_public_access_block" "state_files_public_access" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
-}
-
-# configure the bucket to store the logs from the state files bucket
-resource "aws_s3_bucket_logging" "logs_logging" {
-  bucket        = aws_s3_bucket.state_files.id
-  target_bucket = aws_s3_bucket.logs.id
-  target_prefix = "statebucketlog/"
 }

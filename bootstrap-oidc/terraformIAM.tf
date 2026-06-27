@@ -19,8 +19,6 @@ resource "aws_iam_role" "terraform_role" {
           StringLike = {
             "token.actions.githubusercontent.com:sub" = "repo:${var.github_username}/${var.github_repo_name}:*" # Allow role assumption from GitHub Actions workflows triggered by tags, enabling deployment from tagged releases while maintaining security by restricting access to the specific repository
           }
-
-
         }
       }
 
@@ -30,7 +28,7 @@ resource "aws_iam_role" "terraform_role" {
 
   tags = {
     Name        = "${var.oidc_terraform_role_name}-${var.environment}"
-    environment = var.environment
+    Environment = var.environment
   }
 }
 
@@ -41,14 +39,16 @@ resource "aws_iam_role_policy_attachment" "github_actions_policy_attachment" {
 }
 
 
-# create custom IAM policy for the Terraform pipeline to allow management of IAM roles and policies, which is necessary for Terraform to create and manage the IAM resources defined in the infrastructure code, while ensuring that permissions are scoped appropriately to maintain security best practices in AWS IAM when using OIDC with GitHub Actions for CI/CD pipelines
+# Optimized IAM policy for the Terraform pipeline aligned with the Massar project namespace
 resource "aws_iam_role_policy" "terraform_pipeline_custom_policy" {
   name = "terraform-pipeline-custom-policy-${var.environment}"
   role = aws_iam_role.terraform_role.id
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
+        Sid    = "MassarRoleManagementAndPassRole"
         Effect = "Allow"
         Action = [
           "iam:CreateRole",
@@ -64,21 +64,47 @@ resource "aws_iam_role_policy" "terraform_pipeline_custom_policy" {
           "iam:PutRolePolicy",
           "iam:DeleteRolePolicy",
           "iam:GetRolePolicy",
-          "iam:PassRole",
+          "iam:PassRole"
+        ]
+        Resource = [
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/massar-*"
+        ]
+      },
+      {
+        Sid    = "MassarCustomPolicyManagement"
+        Effect = "Allow"
+        Action = [
           "iam:CreatePolicy",
           "iam:DeletePolicy",
           "iam:GetPolicy",
           "iam:GetPolicyVersion",
           "iam:ListPolicyVersions",
           "iam:CreatePolicyVersion",
-          "iam:DeletePolicyVersion",
-          "iam:CreateOpenIDConnectProvider",
-          "iam:DeleteOpenIDConnectProvider",
+          "iam:DeletePolicyVersion"
+        ]
+        Resource = [
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/massar-*"
+        ]
+      },
+      {
+        Sid    = "AWSManagedPolicyReadAccess"
+        Effect = "Allow"
+        Action = [
+          "iam:GetPolicy",
+          "iam:GetPolicyVersion",
+          "iam:ListPolicyVersions"
+        ]
+        Resource = "arn:aws:iam::aws:policy/*"
+      },
+      {
+        Sid    = "OIDCProviderManagement"
+        Effect = "Allow"
+        Action = [
           "iam:GetOpenIDConnectProvider",
           "iam:TagOpenIDConnectProvider"
         ]
-
-        Resource = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:*"
-    }]
+        Resource = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
+      }
+    ]
   })
 }

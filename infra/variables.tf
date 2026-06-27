@@ -35,12 +35,6 @@ variable "static_bucket_name" {
   type        = string
 }
 
-# variable for the bucket name for state files
-variable "state_bucket_name" {
-  description = "The name of the S3 bucket to create for state files"
-  type        = string
-}
-
 # variable for the log bucket name
 variable "logs_bucket_name" {
   description = "The name of the S3 bucket to create for log files"

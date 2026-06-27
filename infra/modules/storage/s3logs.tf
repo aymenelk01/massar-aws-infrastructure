@@ -8,6 +8,7 @@ resource "aws_s3_bucket" "logs" {
   #checkov:skip=CKV2_AWS_62:S3 event notifications not required — no application logic depends on reacting to S3 object events
 
   bucket = "${var.environment}-${var.logs_bucket_name}"
+  force_destroy = true # since this is a portfolio project, we can allow force deletion of the bucket to avoid manual cleanup and reduce operational overhead, not recommended for production environments where logs are critical for auditing and troubleshooting, but acceptable for a non-production environment where logs can be easily recreated if needed.
 
   lifecycle {
     prevent_destroy = false # set to true to prevent accidental deletion of the bucket

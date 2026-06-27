@@ -55,7 +55,7 @@ resource "aws_ecs_task_definition" "app" {
   container_definitions = jsonencode([
     {
       name                   = "massar-app"
-      image                  = "${var.ecr_repository_url}:latest" # Use the latest tag for the container image, but consider using specific version tags for better control and stability in production environments
+      image                  = "public.ecr.aws/docker/library/nginx:alpine" 
       essential              = true
       readonlyRootFilesystem = true # Set to true to enhance security by preventing write access to the root filesystem, which is a best practice for container security, but ensure that any necessary writable directories are defined as volumes and mounted properly for the application to function correctly
 
@@ -76,6 +76,7 @@ resource "aws_ecs_task_definition" "app" {
           containerPath = "/managed-agents"
           readOnly      = false
         }
+        
       ]
 
       portMappings = [
@@ -85,12 +86,13 @@ resource "aws_ecs_task_definition" "app" {
           protocol      = "tcp"
         }
       ]
-
+       
       environment = [
         { name = "COGNITO_USER_POOL_ID", value = var.user_pool_id },
         { name = "USER_POOL_CLIENT_ID", value = var.user_pool_client_id },
         { name = "ELASTICACHE_ENDPOINT", value = var.elasticache_replication_group_endpoint },
-        { name = "RDS_PROXY_ENDPOINT", value = var.rds_proxy_endpoint },
+        { name = "RDS_PROXY_WRITER_ENDPOINT", value = var.rds_proxy_writer_endpoint },
+        { name = "RDS_PROXY_READER_ENDPOINT", value = var.rds_proxy_reader_endpoint },
         { name = "DB_NAME", value = var.db_name },
         { name = "DB_USERNAME", value = var.db_iam_username },
         { name = "NOTIFICATION_SQS_QUEUE_URL", value = var.sqs_queue_url },
@@ -110,6 +112,10 @@ resource "aws_ecs_task_definition" "app" {
       }
     }
   ])
+   
+   lifecycle {
+    ignore_changes = [container_definitions] # Ignore changes to the container definitions to prevent unnecessary task definition updates when the container image is updated, allowing for smoother deployments and minimizing downtime during updates
+}
 }
 
 # Create an ECS Service to run the tasks and manage the desired count of tasks for high availability and scalability
@@ -117,13 +123,15 @@ resource "aws_ecs_service" "service" {
   name                   = "${var.environment}-service"
   cluster                = aws_ecs_cluster.cluster.id
   task_definition        = aws_ecs_task_definition.app.arn
-  desired_count          = 2 # Set the desired count of tasks to 2 for high availability, but adjust this value based on your application's needs and traffic patterns
+  desired_count          = 1 # Set the desired count of tasks to 2 for high availability, but adjust this value based on your application's needs and traffic patterns
   launch_type            = "FARGATE"
   platform_version       = "LATEST"
   enable_execute_command = true # Enable execute command for remote debugging and management of the tasks, which allows you to run commands in the container without needing to SSH into the underlying EC2 instances, providing a more secure and efficient way to troubleshoot and manage your application tasks
 
   lifecycle {
-    ignore_changes = [task_definition] # Ignore changes to the task definition to prevent unnecessary service updates when the task definition is updated, allowing for smoother deployments and minimizing downtime during updates
+    ignore_changes = [
+      task_definition, # Ignore changes to the task definition to prevent unnecessary service updates when the task definition is updated, allowing for smoother deployments and minimizing downtime during updates
+      desired_count ] 
   }
 
   network_configuration {

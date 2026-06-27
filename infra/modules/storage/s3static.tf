@@ -7,6 +7,7 @@ resource "aws_s3_bucket" "static_files" {
   #checkov:skip=CKV_AWS_145: Portfolio project- AWS default encryption is sufficient for a portfolio project, so using the default AWS-managed encryption to avoid additional costs from a custom KMS key.
 
   bucket = "${var.environment}-${var.static_bucket_name}"
+  force_destroy = true # since this is a portfolio project, we can allow force deletion of the bucket to avoid manual cleanup and reduce operational overhead, not recommended for production environments where static files are critical for application functionality, but acceptable for a non-production environment where static files can be easily recreated if needed.
 
 
   lifecycle {

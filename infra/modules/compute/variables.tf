@@ -33,8 +33,13 @@ variable "elasticache_replication_group_endpoint" {
   type        = string
 }
 
-variable "rds_proxy_endpoint" {
-  description = "The endpoint of the RDS Proxy"
+variable "rds_proxy_writer_endpoint" {
+  description = "The endpoint of the RDS Proxy writer endpoint"
+  type        = string
+}
+
+variable "rds_proxy_reader_endpoint" {
+  description = "the endpoint of the RDS Proxy read-only endpoint"
   type        = string
 }
 
