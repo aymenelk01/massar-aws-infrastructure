@@ -295,7 +295,7 @@ Amazon ECR was selected over Docker Hub as the container registry for both the a
 - **Why Aurora Over Rds and DynamoDb:** The relational storage engine is built on Amazon Aurora Serverless v2 MySQL. The first decision was to use Aurora over standard RDS MySQL. With standard RDS, you must select and provision a fixed instance type — idling 23 hours a day wastes money, while under-provisioning during the exam release spike causes the exact crash the real Massar system is known for. Aurora Serverless v2 solves this by scaling up within seconds in response to real load rather than requiring a manual instance resize or a scheduled scaling window. The second decision was to use Aurora MySQL over DynamoDB: the deeply relational nature of grade calculations, national coefficients, and branch-subject mappings makes a relational database the only appropriate choice, as DynamoDB's key-value model would require shifting complex JOIN logic into the application layer entirely.
 - **Aurora Serverless v2 Capacity Configuration (ACU):** The cluster is configured with a minimum of 0.5 ACU and a maximum of 64 ACU. The minimum is set to 0.5 rather than 0 to eliminate Aurora cold start latency — a serverless cluster at 0 ACU requires several seconds to resume from pause, which is unacceptable on a platform where a student's first request after a long idle period must return immediately. The maximum caps runaway scaling during unexpected traffic and controls worst-case cost. During the Baccalaureate results window the cluster scales freely within this range in response to real connection load from the RDS Proxy connection pool.
 - **Writer/Reader Instance Separation:** The cluster runs two instance types: a single writer instance that handles all write operations (grade submissions, Flyway DDL migrations) and a dedicated static reader instance that serves all read queries through the RDS Proxy read-only endpoint. Aurora Auto Scaling adds up to 5 reader instances during the Baccalaureate spike. This separation protects the writer from being saturated by read traffic — the dominant load pattern during results publication is pure reads from hundreds of thousands of students checking results simultaneously. By absorbing that load on reader instances, the writer remains available and stable for any concurrent write operations. Aurora replicates from writer to readers with sub-10ms lag, which is acceptable for result lookups that are written hours before publication.
-- **Aurora Reader Auto Scaling Strategy:** Reader instances follow the same two-layer scaling approach as the ECS application layer. A target tracking policy scales reader instances horizontally when average CPU across all readers exceeds 70%, with a 60-second scale-out cooldown and a 300-second scale-in cooldown. However, reactive scaling alone is insufficient for Aurora — provisioning a new reader instance takes 3–5 minutes, meaning a CPU-triggered scale-out during the Bac results spike would arrive too late. To solve this, a scheduled action pre-warms the reader floor to 3 instances at 23:00 UTC on July 14 (midnight Morocco time), two hours before results go live, with a ceiling of 5. A second scheduled action returns the floor to 1 reader and ceiling to 3 on July 16 23:00 UTC. During normal operation the single static reader handles non-cached read traffic from teachers and administrators. During the spike the pre-warmed readers serve as the fallback layer for any cache misses that reach Aurora, ensuring the writer remains uncontested regardless of ElastiCache behavior.
+- **Aurora Reader Auto Scaling Strategy:** Reader instances follow the same two-layer scaling approach as the ECS application layer. A target tracking policy scales reader instances horizontally when average CPU across all readers exceeds 70%, with a 60-second scale-out cooldown and a 300-second scale-in cooldown. However, reactive scaling alone is insufficient for Aurora — provisioning a new reader instance takes 3–5 minutes, meaning a CPU-triggered scale-out during the Bac results spike would arrive too late. To solve this, a scheduled action pre-warms the reader floor to 3 instances at 23:00 UTC on July 14 (midnight Morocco time), two hours before results go live, with a ceiling of 5. A second scheduled action returns the floor to 1 reader and ceiling to 3 on July 16 23:00 UTC. During normal operation the single static reader handles non-cached read traffic from teachers and administrators. During the spike the pre-warmed readers serve as the fallback layer for any cache misses that reach Aurora, ensuring the writer remains uncontested regardless of ElastiCache behavior.([autoscaling.tf](/infra/modules/database/autoscaling.tf)).
 
 </details>
 
@@ -400,18 +400,36 @@ To secure infrastructure state and enable safe team collaboration, the project u
 <details>
 <summary><b>Amazon CloudWatch for Logging and Monitoring</b> (Click to expand)</summary>
 
-All system logs—including ECS container stdout/stderr, Lambda function executions, RDS database slow query and audit logs, and VPC Flow Logs—are captured and centralized in Amazon CloudWatch. All log groups are configured with explicit retention policies to prevent logs from accumulating indefinitely and driving up storage costs. CloudWatch Container Insights is enabled on the ECS cluster to provide real-time CPU, memory, and network metrics, giving operations teams complete visibility into container performance under peak load.
+Six dedicated log groups are provisioned across four modules, each with an explicit 7-day retention policy:
+
+| Log Group | Module | Content |
+|---|---|---|
+| `/ecs/massar-{env}` | compute | ECS app container stdout/stderr |
+| `/ecs/exec/massar-{env}` | compute | ECS Exec interactive session audit trail |
+| `/ecs/flyway/massar-{env}` | compute | Flyway migration task output |
+| `/aurora/massar-error-{env}` | database | Aurora engine errors |
+| `/aurora/massar-slowquery-{env}` | database | Aurora slow query log |
+| `/aws/lambda/massar-notifications-{env}` | notifications | Lambda function execution output |
+| VPC Flow Logs | vpc | All accepted/rejected network flows |
+
+**Retention set to 7 days:** The default CloudWatch behaviour with no retention policy is to retain logs indefinitely, which accumulates storage costs silently. The 7-day window is a deliberate cost-containment decision for a portfolio project — it covers the window in which any deployment issue or traffic spike would be actively investigated. In a production environment, compliance requirements (e.g., audit logs, slow query logs) would extend this to 90 days or longer.
+
+**ECS Exec audit log:** Every interactive shell session opened via `aws ecs execute-command` is written to the dedicated exec log group. This ensures that any debugging access to a running Fargate container during an incident is captured and traceable, rather than being an unlogged back-door into the production environment.
+
+**Aurora slow query log:** Enabled on the cluster via `enabled_cloudwatch_logs_exports = ["error", "slowquery"]`. This surfaces any query taking longer than the `long_query_time` threshold directly in CloudWatch without requiring SSH access to a database host — a key operational advantage of managed Aurora over self-hosted MySQL.
+
+**VPC Flow Logs:** All network traffic accepted and rejected within the VPC is captured via the vpc module and streamed to CloudWatch. During a security incident or unexpected traffic spike, flow logs provide the network-level audit trail needed to identify the source — including any unexpected outbound connections that would indicate a compromised container.([vpcflowlogs.tf](/infra/modules/vpc/vpcflowlogs.tf)).
 
 </details>
 
-#### Application Auto-Scaling Strategy For ECS
+<details>
+<summary><b>Application Auto-Scaling Strategy For ECS</b>(Click to expand)</summary>
+Massar's traffic is not random. It spikes on predictable, calendar-driven events — most critically the publication of Baccalaureate results every July. The original infrastructure reacted to these spikes after they started, by which point the service was already degraded and returning errors to users.
+Reactive scaling alone does not solve this. A target tracking policy watching CPU starts from the current running task count. If only 1 task is running when 500,000 users simultaneously hit the site, the policy fires — but the 60–90 seconds required for Fargate task provisioning, image pull, and ALB registration means users are already experiencing failure before new capacity is available.
+</details>
 
 <details>
 <summary>Click to see how this autoscaling strategy improves performance</summary>
-
-Massar's traffic is not random. It spikes on predictable, calendar-driven events — most critically the publication of Baccalaureate results every July. The original infrastructure reacted to these spikes after they started, by which point the service was already degraded and returning errors to users.
-Reactive scaling alone does not solve this. A target tracking policy watching CPU starts from the current running task count. If only 1 task is running when 500,000 users simultaneously hit the site, the policy fires — but the 60–90 seconds required for Fargate task provisioning, image pull, and ALB registration means users are already experiencing failure before new capacity is available.
-
 
 ##### Decision — Two-Layer Scaling
  
@@ -547,7 +565,7 @@ Considered for cost optimization. Rejected because ECS target tracking cannot sc
 - **S3 Tiered Lifecycle Management:** Both the documents and logs S3 buckets use automated lifecycle configurations to minimize storage fees. The documents bucket transitions PDF diplomas to `STANDARD_IA` (Infrequent Access) after 90 days, archives them to `GLACIER` after 365 days, and deletes non-current versions after 30 days. The logs bucket transitions access logs to `STANDARD_IA` after 30 days, to `GLACIER` after 90 days, and permanently deletes them after 365 days, significantly reducing S3 storage costs.([s3logs.tf](/infra/modules/storage/s3logs.tf))([s3documents.tf](/infra/modules/storage/s3documents.tf)).
 - **AWS Budgets Configuration:** An AWS Budget is configured to monitor costs monthly with a limit of $50/month(since this is a portfolio project), triggering email notifications if actual or forecasted costs exceed 80% of the threshold ([main.tf](budget/main.tf)).
 
-- **Auto Scaling Strategy:** Massar's original infrastructure was statically provisioned for peak load year-round. This redesign eliminates that by matching capacity to actual demand at any given time, improving performance while saving money.
+- **Auto Scaling Strategy:** Massar's original infrastructure was statically provisioned for peak load year-round. This redesign eliminates that by matching capacity to actual demand at any given time, improving performance while saving money.([autoscaling.tf](/infra/modules/compute/autoscaling.tf)).
 
 <details>
 <summary>Click to see how this autoscaling strategy improves cost efficiency</summary>
