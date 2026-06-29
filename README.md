@@ -2,6 +2,8 @@
 
 This repository contains the production-grade AWS infrastructure code for the Massar platform redesign, built entirely using Terraform and automated via GitHub Actions CI/CD pipelines.
 
+**Companion repository:** [aymenelk01/massar-app](https://github.com/aymenelk01/massar-app) — the application code for test the infrastructure and deployment pipelines that run on top of this infrastructure.
+
 > **Deploying this project?** See the **[Deployment Guide](DEPLOYMENT.md)** for prerequisites, step-by-step bootstrap instructions, variable reference, and teardown procedures.
 
 ---
