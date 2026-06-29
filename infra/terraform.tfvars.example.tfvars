@@ -1,0 +1,9 @@
+aws_region            = "eu-south-1"
+environment           = "dev"
+service               = "Massar"
+db_name               = "massardb"
+db_username           = "aymenelk01"
+documents_bucket_name = "app-massar-documents"
+static_bucket_name    = "app-massar-static"
+logs_bucket_name      = "app-massar-logs"
+/* certificate_arn           = "arn:aws:acm:eu-south-1:123456789012:certificate/abcdefg-1234-5678-abcd-1234567890ab" */ # replace with your actual certificate ARN if you want to enable HTTPS for the ALB, otherwise leave it as is or remove it

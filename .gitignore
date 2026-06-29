@@ -17,6 +17,7 @@ crash.*.log
 *.tfvars.json
 # Allow infracost.tfvars to be committed
 !infracost.tfvars
+!terraform.tfvars.example.tfvars
 
 # Override files
 override.tf
@@ -40,3 +41,5 @@ Thumbs.db
 package-lock.json
 
 builds/
+
+*.deb
