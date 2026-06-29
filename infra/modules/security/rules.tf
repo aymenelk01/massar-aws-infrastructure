@@ -91,7 +91,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_to_s3" {
 
 resource "aws_vpc_security_group_egress_rule" "ecs_to_aurora" {
   security_group_id            = aws_security_group.ecs_sg.id
-  description                  = "Allow outbound database queries directly to the Aurora cluster (e.g. for Flyway migrations)"
+  description                  = "Allow outbound database queries directly to the Aurora cluster (Flyway migrations)"
   from_port                    = 3306
   to_port                      = 3306
   ip_protocol                  = "tcp"
